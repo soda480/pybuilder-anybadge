@@ -55,3 +55,4 @@ def set_properties(project):
     # only for functional testing plugin
     # project.set_property('anybadge_exclude', 'severity,coverage')
     # project.set_property('anybadge_add_to_readme', True)
+    # project.set_property('anybadge_complexity_use_average', True)
