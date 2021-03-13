@@ -1,6 +1,7 @@
 #   -*- coding: utf-8 -*-
 import os
 import re
+import sys
 import json
 from pybuilder.core import init
 from pybuilder.core import task
@@ -16,6 +17,7 @@ def init_anybadge(project):
     project.plugin_depends_on('anybadge')
     project.set_property_if_unset('anybadge_exclude', [])
     project.set_property_if_unset('anybadge_add_to_readme', False)
+    project.set_property_if_unset('anybadge_complexity_use_average', False)
 
 
 @task('anybadge', description='generate badges from reports using anybadge')
@@ -29,11 +31,21 @@ def anybadge(project, logger):
     exclude = get_badge_exclude(project)
     logger.debug(f'task instructed to exclude {exclude}')
     if 'complexity' not in exclude:
-        create_complexity_badge(f'{reports_directory}/radon', f'{images_directory}/complexity.svg', logger, add_to_readme)
+        report_path = f'{reports_directory}/radon'
+        badge_path = f'{images_directory}/complexity.svg'
+        use_average = project.get_property('anybadge_complexity_use_average')
+        create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average)
     if 'severity' not in exclude:
-        create_severity_badge(f'{reports_directory}/bandit.json', f'{images_directory}/severity.svg', logger, add_to_readme)
+        report_path = f'{reports_directory}/bandit.json'
+        badge_path = f'{images_directory}/severity.svg'
+        create_severity_badge(report_path, badge_path, logger, add_to_readme)
     if 'coverage' not in exclude:
-        create_coverage_badge(f'{reports_directory}/coverage', f'{images_directory}/coverage.svg', logger, add_to_readme)
+        report_path = f'{reports_directory}/coverage.json'
+        badge_path = f'{images_directory}/coverage.svg'
+        create_coverage_badge(report_path, badge_path, logger, add_to_readme)
+    if 'python' not in exclude:
+        badge_path = f'{images_directory}/python.svg'
+        create_python_badge(badge_path, logger, add_to_readme)
 
 
 def get_images_directory(project):
@@ -168,14 +180,12 @@ def get_severity_badge(severity_report):
     return Badge('severity', value=value, default_color=color, num_padding_chars=1)
 
 
-def get_coverage(coverage_lines):
+def get_coverage(coverage_data):
     """ return coverage from coveage lines
     """
-    total_line = coverage_lines[-1].strip()
-    regex = r'^TOTAL.* (?P<coverage>\d+)%$'
-    match = re.match(regex, total_line)
-    if match:
-        return int(match.group('coverage'))
+    if len(coverage_data['module_names']) == 0:
+        return 0
+    return coverage_data['overall_coverage']
 
 
 def get_coverage_badge(coverage):
@@ -190,6 +200,14 @@ def get_coverage_badge(coverage):
         color = 'red'
     value = f'{coverage}%'
     return Badge('coverage', value=value, default_color=color, num_padding_chars=1)
+
+
+def get_python_badge():
+    """ return badge for python version
+    """
+    value = f'{sys.version_info.major}.{sys.version_info.minor}'
+    color = 'teal'
+    return Badge('python', value=value, default_color=color, num_padding_chars=1)
 
 
 def update_readme(name, badge_filename, add_to_readme, logger):
@@ -216,7 +234,7 @@ def update_readme(name, badge_filename, add_to_readme, logger):
             file_handler.writelines(lines)
 
 
-def create_complexity_badge(report_filename, badge_filename, logger, add_to_readme):
+def create_complexity_badge(report_filename, badge_filename, logger, add_to_readme, use_average):
     """ create complexity badge from radon report
     """
     if not accessible(report_filename):
@@ -224,7 +242,7 @@ def create_complexity_badge(report_filename, badge_filename, logger, add_to_read
         return
     lines = read_lines(report_filename)
     report = get_complexity_report(lines)
-    badge = get_complexity_badge(report)
+    badge = get_complexity_badge(report, use_average=use_average)
     logger.info(f'writing complexity badge {badge_filename}')
     badge.write_badge(badge_filename, overwrite=True)
     update_readme('complexity', badge_filename, add_to_readme, logger)
@@ -249,12 +267,16 @@ def create_coverage_badge(report_filename, badge_filename, logger, add_to_readme
     if not accessible(report_filename):
         logger.warn(f'{report_filename} does not exist or is not accessible')
         return
-    lines = read_lines(report_filename)
-    coverage = get_coverage(lines)
-    if coverage is None:
-        logger.warn(f'unable to extract coverage data from: {report_filename}')
-        return
+    data = read_data(report_filename)
+    coverage = get_coverage(data)
     badge = get_coverage_badge(coverage)
     logger.info(f'writing coverage badge {badge_filename}')
     badge.write_badge(badge_filename, overwrite=True)
     update_readme('coverage', badge_filename, add_to_readme, logger)
+
+
+def create_python_badge(badge_filename, logger, add_to_readme):
+    badge = get_python_badge()
+    logger.info(f'writing python version badge {badge_filename}')
+    badge.write_badge(badge_filename, overwrite=True)
+    update_readme('python', badge_filename, add_to_readme, logger)
