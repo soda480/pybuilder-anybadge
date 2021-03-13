@@ -30,7 +30,7 @@ jobs:
       run: |
         apk update
         apk add bash curl
-        sed -e 's,filename="pybuilder-anybadge/,filename="src/main/python/pybuilder_anybadge/,g' target/reports/pybuilder-anybadge_coverage.xml > coverage.xml
+        sed -e 's,filename="pybuilder-anybadge/,filename="src/main/python/pybuilder_anybadge/,g' target/reports/coverage.xml > coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
