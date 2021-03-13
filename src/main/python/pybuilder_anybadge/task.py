@@ -181,8 +181,7 @@ def get_coverage(coverage_lines):
 def get_coverage_badge(coverage):
     """ return coverage badge based off of coverage report
     """
-    if coverage <= 100:
-        color = 'green'
+    color = 'green'
     if coverage < 85:
         color = 'yellow'
     if coverage < 70:

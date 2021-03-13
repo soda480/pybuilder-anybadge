@@ -143,16 +143,19 @@ class TestTask(unittest.TestCase):
 
         self.assertFalse(accessible('--filename--'))
 
-    @unittest.skip('skip')
-    @patch('builtins.open')
+    @patch('pybuilder_anybadge.task.open', create=True)
     def test__read_lines_Should_ReturnExpected_When_Called(self, open_patch, *patches):
-        open_patch.return_value.__enter__.return_value = mock_open(read_data='line1')
+        open_patch.side_effect = [
+            mock_open(read_data='--data--').return_value
+        ]
         read_lines('--filename--')
 
-    @patch('builtins.open')
+    @patch('pybuilder_anybadge.task.open', create=True)
     @patch('pybuilder_anybadge.task.json')
     def test__read_data_Should_ReturnExpected_When_Called(self, json_patch, open_patch, *patches):
-        open_patch.return_value.__enter__.return_value = mock_open()
+        open_patch.side_effect = [
+            mock_open(read_data='--data--').return_value
+        ]
         result = read_data('--filename--')
         self.assertEqual(result, json_patch.load.return_value)
 
@@ -261,6 +264,18 @@ class TestTask(unittest.TestCase):
         badge_patch.assert_called_once_with('complexity', value='Unstable', default_color='brightred', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
+    def test__get_complexity_badge_Should_ReturnExpected_When_UseAverage(self, badge_patch, *patches):
+        complexity_report = {
+            'average': 79,
+            'highest': {
+                'score': 50
+            }
+        }
+        result = get_complexity_badge(complexity_report, use_average=True)
+        self.assertEqual(result, badge_patch.return_value)
+        badge_patch.assert_called_once_with('complexity', value='Unstable', default_color='brightred', num_padding_chars=1)
+
+    @patch('pybuilder_anybadge.task.Badge')
     def test__get_severity_badge_Should_ReturnExpected_When_GrayUndefined(self, badge_patch, *patches):
         severity_report = {
             'metrics': {
@@ -365,3 +380,88 @@ class TestTask(unittest.TestCase):
         result = get_coverage_badge(54)
         self.assertEqual(result, badge_patch.return_value)
         badge_patch.assert_called_once_with('coverage', value='54%', default_color='red', num_padding_chars=1)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=False)
+    def test__update_readme_Should_CallExpected_When_AddToReadmeFalseAccessibleFalse(self, *patches):
+        logger_mock = Mock()
+        update_readme('--name--', '--filename--', False, logger_mock)
+        logger_mock.warn.assert_not_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=False)
+    def test__update_readme_Should_CallExpected_When_AddToReadmeTrueAccessibleFalse(self, *patches):
+        logger_mock = Mock()
+        update_readme('--name--', '--filename--', True, logger_mock)
+        logger_mock.warn.assert_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.open', create=True)
+    def test__update_readme_Should_CallExpected_When_NoMatch(self, open_patch, *patches):
+        open_patch.side_effect = [
+            mock_open(read_data='--data--').return_value
+        ]
+        logger_mock = Mock()
+        update_readme('--name--', '/pybuilder_anybadge/docs/images/severity.svg', True, logger_mock)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.open', create=True)
+    def test__update_readme_Should_CallExpected_When_Match(self, open_patch, *patches):
+        open_patch.side_effect = [
+            mock_open(read_data='![severity](docs/images/severity.svg)\n').return_value
+        ]
+        logger_mock = Mock()
+        update_readme('severity', '/pybuilder_anybadge/docs/images/severity.svg', True, logger_mock)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=False)
+    def test__create_complexity_badge_Should_CallExpected_When_NotAccessible(self, *patches):
+        logger_mock = Mock()
+        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        logger_mock.warn.assert_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.read_lines')
+    @patch('pybuilder_anybadge.task.get_complexity_report')
+    @patch('pybuilder_anybadge.task.get_complexity_badge')
+    @patch('pybuilder_anybadge.task.update_readme')
+    def test__create_complexity_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, *patches):
+        logger_mock = Mock()
+        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        update_readme_patch.assert_called_once_with('complexity', '--badge-filename--', True, logger_mock)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=False)
+    def test__create_severity_badge_Should_CallExpected_When_NotAccessible(self, *patches):
+        logger_mock = Mock()
+        create_severity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        logger_mock.warn.assert_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.read_data')
+    @patch('pybuilder_anybadge.task.get_severity_badge')
+    @patch('pybuilder_anybadge.task.update_readme')
+    def test__create_severity_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, *patches):
+        logger_mock = Mock()
+        create_severity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        update_readme_patch.assert_called_once_with('severity', '--badge-filename--', True, logger_mock)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=False)
+    def test__create_coverage_badge_Should_CallExpected_When_NotAccessible(self, *patches):
+        logger_mock = Mock()
+        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        logger_mock.warn.assert_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.read_lines')
+    @patch('pybuilder_anybadge.task.get_coverage', return_value=None)
+    def test__create_coverage_badge_Should_CallExpected_When_AccessibleNoCoverage(self, *patches):
+        logger_mock = Mock()
+        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        logger_mock.warn.assert_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.read_lines')
+    @patch('pybuilder_anybadge.task.get_coverage')
+    @patch('pybuilder_anybadge.task.get_coverage_badge')
+    @patch('pybuilder_anybadge.task.update_readme')
+    def test__create_coverage_badge_Should_CallExpected_When_AccessibleCoverage(self, update_readme_patch, *patches):
+        logger_mock = Mock()
+        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        update_readme_patch.assert_called_once_with('coverage', '--badge-filename--', True, logger_mock)
