@@ -17,8 +17,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install required packages
+      run: apk --update --no-cache add gcc libc-dev libffi-dev openssl-dev
+
     - name: Install pybuilder
-      run: pip install pybuilder==0.11.17
+      run: pip install pybuilder
 
     - name: Install dependencies
       run: pyb install_dependencies
@@ -30,7 +33,7 @@ jobs:
       run: |
         apk update
         apk add bash curl
-        sed -e 's,filename="pybuilder-anybadge/,filename="src/main/python/pybuilder_anybadge/,g' target/reports/coverage.xml > coverage.xml
+        sed -e 's,filename="pybuilder-anybadge/,filename="src/main/python/pybuilder_anybadge/,g' target/reports/pybuilder-anybadge_coverage.xml > coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
