@@ -129,7 +129,7 @@ def get_complexity_badge(complexity_report, use_average=False):
         color = 'yellow'
     elif score <= 30:
         value = 'Complex'
-        score = 'orange'
+        color = 'orange'
     elif score <= 40:
         value = 'Alarming'
         color = 'red'
@@ -172,7 +172,7 @@ def get_coverage(coverage_lines):
     """ return coverage from coveage lines
     """
     total_line = coverage_lines[-1].strip()
-    regex = r'^TOTAL.*(?P<coverage>\d+)%$'
+    regex = r'^TOTAL.* (?P<coverage>\d+)%$'
     match = re.match(regex, total_line)
     if match:
         return int(match.group('coverage'))

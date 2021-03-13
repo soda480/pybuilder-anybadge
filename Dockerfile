@@ -9,5 +9,5 @@ COPY . /pybuilder-anybadge/
 
 # RUN apk --update --no-cache add gcc libc-dev libffi-dev openssl-dev
 RUN pip install pybuilder==0.11.17
-# RUN pyb install_dependencies
+RUN pyb install_dependencies
 # RUN pyb install
