@@ -5,7 +5,7 @@
 
 # pybuilder-anybadge #
 
-A pybuilder plugin that generates badges for your project using the `anybadge` Python project, for more information refer to the [anybadge pypi page](https://pypi.org/project/anybadge/).
+A pybuilder plugin that generates badges for your project using `anybadge`, for more information refer to the [anybadge pypi page](https://pypi.org/project/anybadge/).
 
 To add this plugin into your pybuilder project, add the following line near the top of your build.py:
 ```python
@@ -19,7 +19,7 @@ use_plugin('pypi:pybuilder_anybadge', '~=0.1.0')
 
 ### Pybuilder anybadge properties ###
 
-The pybuilder task `pyb anybadge` will use anybadge to generate badges for your project by processing reports produced by using various plugins; the badges that are currently supported are:
+The pybuilder task `pyb anybadge` will use anybadge to generate badges for your project by processing reports produced from various plugins; the badges that are currently supported are:
 - **complexity** - requires the [pybuilder_radon](https://pypi.org/project/pybuilder-radon/) plugin. Will depict cyclomatic complexity score for the most complicated function found in your project.
 - **severity** - requires the [pybuilder_bandit](https://pypi.org/project/pybuilder-bandit/) plugin. Will depict security vulnerabilities discovered by severity.
 - **coverage** - requires the `coverage` plugin. Will depict unit test overall coverage.
@@ -29,7 +29,7 @@ The plugin will write the respective badges to the `docs/images` folder. The fol
 Name | Type | Default Value | Description
 -- | -- | -- | --
 anybadge_exclude | str | '' | Comma delimited string of badges to exclude from processing, valid values are 'complexity', 'severity' and 'coverage'
-anybadge_add_to_readme | bool | False | Specify if plugin should add links to the README.md file. **Note** the plugin will add the reference but you must commit/push the changes (including files in docs/images).
+anybadge_add_to_readme | bool | False | Specify if plugin should add badges to the README.md file (see below for example). **Note** the plugin will add the badge references but you must commit/push the changes (including svg files in the docs/images folder).
 
 The plugin properties are set using `project.set_property`, the following is an example of how to set the properties:
 
