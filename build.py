@@ -4,7 +4,7 @@ from pybuilder.core import init
 from pybuilder.core import Author
 
 # only for functional testing plugin
-from pybuilder_anybadge import anybadge
+# from pybuilder_anybadge import anybadge
 
 use_plugin('python.core')
 use_plugin('python.unittest')
