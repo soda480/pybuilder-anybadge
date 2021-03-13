@@ -22,7 +22,7 @@ def init_anybadge(project):
 
 @task('anybadge', description='generate badges from reports using anybadge')
 @depends('prepare')
-def anybadge(project, logger):
+def anybadge(project, logger, reactor):
     """ generate badges from reports using anybadge
     """
     reports_directory = project.expand_path('$dir_reports')
@@ -40,7 +40,7 @@ def anybadge(project, logger):
         badge_path = f'{images_directory}/severity.svg'
         create_severity_badge(report_path, badge_path, logger, add_to_readme)
     if 'coverage' not in exclude:
-        report_path = f'{reports_directory}/coverage.json'
+        report_path = f'{reports_directory}/{project.name}_coverage.json'
         badge_path = f'{images_directory}/coverage.svg'
         create_coverage_badge(report_path, badge_path, logger, add_to_readme)
     if 'python' not in exclude:

@@ -38,7 +38,7 @@ The plugin properties are set using `project.set_property`, the following is an 
 ```Python
 project.set_property('anybadge_exclude', 'severity,coverage')
 project.set_property('anybadge_add_to_readme', True)
-project.set_property('anybadge_complexity_use_average', False)
+project.set_property('anybadge_complexity_use_average', True)
 ```
 
 The following badges were generated for this project using the `pybuilder_anybadge` plugin:

@@ -53,10 +53,10 @@ class TestTask(unittest.TestCase):
         get_badge_exclude_patch.return_value = ['complexity']
         project_mock = Mock()
         logger_mock = Mock()
-        anybadge(project_mock, logger_mock)
+        anybadge(project_mock, logger_mock, Mock())
         create_complexity_badge_patch.assert_not_called()
         create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, project_mock.get_property.return_value)
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, project_mock.get_property.return_value)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, project_mock.get_property.return_value)
         create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, project_mock.get_property.return_value)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
@@ -70,10 +70,10 @@ class TestTask(unittest.TestCase):
         project_mock = Mock()
         project_mock.get_property.side_effect = [True, True]
         logger_mock = Mock()
-        anybadge(project_mock, logger_mock)
+        anybadge(project_mock, logger_mock, Mock())
         create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, True, True)
         create_severity_badge_patch.assert_not_called()
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, True)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, True)
         create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, True)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
@@ -87,7 +87,7 @@ class TestTask(unittest.TestCase):
         project_mock = Mock()
         project_mock.get_property.side_effect = [False, False]
         logger_mock = Mock()
-        anybadge(project_mock, logger_mock)
+        anybadge(project_mock, logger_mock, Mock())
         create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, False)
         create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, False)
         create_coverage_badge_patch.assert_not_called()
@@ -104,10 +104,10 @@ class TestTask(unittest.TestCase):
         project_mock = Mock()
         project_mock.get_property.side_effect = [False, False]
         logger_mock = Mock()
-        anybadge(project_mock, logger_mock)
+        anybadge(project_mock, logger_mock, Mock())
         create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, False)
         create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, False)
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, False)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, False)
         create_python_badge_patch.assert_not_called()
 
     @patch('pybuilder_anybadge.task.get_images_directory')
@@ -120,7 +120,7 @@ class TestTask(unittest.TestCase):
         get_badge_exclude_patch.return_value = ['coverage', 'severity', 'complexity', 'python']
         project_mock = Mock()
         logger_mock = Mock()
-        anybadge(project_mock, logger_mock)
+        anybadge(project_mock, logger_mock, Mock())
         create_complexity_badge_patch.assert_not_called()
         create_severity_badge_patch.assert_not_called()
         create_coverage_badge_patch.assert_not_called()

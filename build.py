@@ -12,15 +12,15 @@ use_plugin('python.install_dependencies')
 use_plugin('python.flake8')
 use_plugin('python.coverage')
 use_plugin('python.distutils')
-use_plugin('pypi:pybuilder_radon', '~=0.1.2')
-use_plugin('pypi:pybuilder_bandit', '~=0.1.2')
+use_plugin('pypi:pybuilder_radon')
+use_plugin('pypi:pybuilder_bandit')
 
 
 name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'Pybuilder plugin for anybadge badge generator'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.1.1'
+version = '0.2.0'
 default_task = ['clean', 'analyze', 'radon', 'bandit']
 license = 'Apache License, Version 2.0'
 description = summary
@@ -55,3 +55,4 @@ def set_properties(project):
     # only for functional testing plugin
     # project.set_property('anybadge_exclude', 'severity,coverage')
     # project.set_property('anybadge_add_to_readme', True)
+    # project.set_property('anybadge_complexity_use_average', True)
