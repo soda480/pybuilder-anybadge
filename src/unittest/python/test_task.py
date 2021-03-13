@@ -17,10 +17,12 @@ from pybuilder_anybadge.task import get_complexity_badge
 from pybuilder_anybadge.task import get_severity_badge
 from pybuilder_anybadge.task import get_coverage
 from pybuilder_anybadge.task import get_coverage_badge
+from pybuilder_anybadge.task import get_python_badge
 from pybuilder_anybadge.task import update_readme
 from pybuilder_anybadge.task import create_complexity_badge
 from pybuilder_anybadge.task import create_severity_badge
 from pybuilder_anybadge.task import create_coverage_badge
+from pybuilder_anybadge.task import create_python_badge
 
 
 class TestTask(unittest.TestCase):
@@ -42,60 +44,87 @@ class TestTask(unittest.TestCase):
         self.assertTrue(call('anybadge_add_to_readme', False) in project_mock.set_property_if_unset.mock_calls)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_severity_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeComplexity(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, get_images_directory_patch, *patches):
+    def test__anybadge_Should_CallExpected_When_ExcludeComplexity(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
         get_badge_exclude_patch.return_value = ['complexity']
         project_mock = Mock()
         logger_mock = Mock()
         anybadge(project_mock, logger_mock)
         create_complexity_badge_patch.assert_not_called()
         create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, project_mock.get_property.return_value)
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, project_mock.get_property.return_value)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, project_mock.get_property.return_value)
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, project_mock.get_property.return_value)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_severity_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeSeverity(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, get_images_directory_patch, *patches):
+    def test__anybadge_Should_CallExpected_When_ExcludeSeverity(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
         get_badge_exclude_patch.return_value = ['severity']
         project_mock = Mock()
+        project_mock.get_property.side_effect = [True, True]
         logger_mock = Mock()
         anybadge(project_mock, logger_mock)
-        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, project_mock.get_property.return_value)
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, True, True)
         create_severity_badge_patch.assert_not_called()
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, project_mock.get_property.return_value)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, True)
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, True)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_severity_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeCoverage(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, get_images_directory_patch, *patches):
+    def test__anybadge_Should_CallExpected_When_ExcludeCoverage(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
         get_badge_exclude_patch.return_value = ['coverage']
         project_mock = Mock()
+        project_mock.get_property.side_effect = [False, False]
         logger_mock = Mock()
         anybadge(project_mock, logger_mock)
-        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, project_mock.get_property.return_value)
-        create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, project_mock.get_property.return_value)
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, False)
+        create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, False)
         create_coverage_badge_patch.assert_not_called()
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_severity_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeAll(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, get_images_directory_patch, *patches):
-        get_badge_exclude_patch.return_value = ['coverage', 'severity', 'complexity']
+    def test__anybadge_Should_CallExpected_When_ExcludePython(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
+        get_badge_exclude_patch.return_value = ['python']
+        project_mock = Mock()
+        project_mock.get_property.side_effect = [False, False]
+        logger_mock = Mock()
+        anybadge(project_mock, logger_mock)
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, False)
+        create_severity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/severity.svg', logger_mock, False)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, False)
+        create_python_badge_patch.assert_not_called()
+
+    @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_python_badge')
+    @patch('pybuilder_anybadge.task.create_coverage_badge')
+    @patch('pybuilder_anybadge.task.create_severity_badge')
+    @patch('pybuilder_anybadge.task.create_complexity_badge')
+    @patch('pybuilder_anybadge.task.get_badge_exclude')
+    def test__anybadge_Should_CallExpected_When_ExcludeAll(self, get_badge_exclude_patch, create_complexity_badge_patch, create_severity_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
+        get_badge_exclude_patch.return_value = ['coverage', 'severity', 'complexity', 'python']
         project_mock = Mock()
         logger_mock = Mock()
         anybadge(project_mock, logger_mock)
         create_complexity_badge_patch.assert_not_called()
         create_severity_badge_patch.assert_not_called()
         create_coverage_badge_patch.assert_not_called()
+        create_python_badge_patch.assert_not_called()
 
     @patch('pybuilder_anybadge.task.os.path.exists', return_value=False)
     @patch('pybuilder_anybadge.task.os.makedirs')
@@ -339,23 +368,20 @@ class TestTask(unittest.TestCase):
         self.assertEqual(result, badge_patch.return_value)
         badge_patch.assert_called_once_with('severity', value='High', default_color='red', num_padding_chars=1)
 
-    def test__get_coverage_Should_Return_Expected_When_Match(self, *patches):
-        coverage_lines = [
-            'pybuilder_anybadge/task.py         166     64     64      1    60%\n',
-            '------------------------------------------------------------------\n',
-            'TOTAL                              167     64     64      4    61%\n'
-        ]
-        result = get_coverage(coverage_lines)
-        expected_result = 61
-        self.assertEqual(result, expected_result)
+    def test__get_coverage_Should_Return_Expected_When_NoModuleNames(self, *patches):
+        coverage_data = {
+            'module_names': [],
+        }
+        result = get_coverage(coverage_data)
+        self.assertEqual(result, len(coverage_data['module_names']))
 
-    def test__get_coverage_Should_Return_Mpme_When_NoMatch(self, *patches):
-        coverage_lines = [
-            'pybuilder_anybadge/task.py         166     64     64      1    60%\n',
-            '------------------------------------------------------------------\n'
-        ]
-        result = get_coverage(coverage_lines)
-        self.assertIsNone(result)
+    def test__get_coverage_Should_Return_Expected_When_ModuleNames(self, *patches):
+        coverage_data = {
+            'module_names': ['--module1--', '--module2--'],
+            'overall_coverage': 45.0
+        }
+        result = get_coverage(coverage_data)
+        self.assertEqual(result, coverage_data['overall_coverage'])
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Green(self, badge_patch, *patches):
@@ -380,6 +406,15 @@ class TestTask(unittest.TestCase):
         result = get_coverage_badge(54)
         self.assertEqual(result, badge_patch.return_value)
         badge_patch.assert_called_once_with('coverage', value='54%', default_color='red', num_padding_chars=1)
+
+    @patch('pybuilder_anybadge.task.sys')
+    @patch('pybuilder_anybadge.task.Badge')
+    def test__get_python_badge_Should_ReturnExpected_When_Called(self, badge_patch, sys_patch, *patches):
+        sys_patch.version_info.major = '--major--'
+        sys_patch.version_info.minor = '--minor--'
+        result = get_python_badge()
+        self.assertEqual(result, badge_patch.return_value)
+        badge_patch.assert_called_once_with('python', value='--major--.--minor--', default_color='teal', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__update_readme_Should_CallExpected_When_AddToReadmeFalseAccessibleFalse(self, *patches):
@@ -414,7 +449,7 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_complexity_badge_Should_CallExpected_When_NotAccessible(self, *patches):
         logger_mock = Mock()
-        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True, False)
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
@@ -424,7 +459,7 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_complexity_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, *patches):
         logger_mock = Mock()
-        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True, False)
         update_readme_patch.assert_called_once_with('complexity', '--badge-filename--', True, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
@@ -449,15 +484,7 @@ class TestTask(unittest.TestCase):
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
-    @patch('pybuilder_anybadge.task.read_lines')
-    @patch('pybuilder_anybadge.task.get_coverage', return_value=None)
-    def test__create_coverage_badge_Should_CallExpected_When_AccessibleNoCoverage(self, *patches):
-        logger_mock = Mock()
-        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
-        logger_mock.warn.assert_called()
-
-    @patch('pybuilder_anybadge.task.accessible', return_value=True)
-    @patch('pybuilder_anybadge.task.read_lines')
+    @patch('pybuilder_anybadge.task.read_data')
     @patch('pybuilder_anybadge.task.get_coverage')
     @patch('pybuilder_anybadge.task.get_coverage_badge')
     @patch('pybuilder_anybadge.task.update_readme')
@@ -465,3 +492,10 @@ class TestTask(unittest.TestCase):
         logger_mock = Mock()
         create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
         update_readme_patch.assert_called_once_with('coverage', '--badge-filename--', True, logger_mock)
+
+    @patch('pybuilder_anybadge.task.get_python_badge')
+    @patch('pybuilder_anybadge.task.update_readme')
+    def test__create_python_badge_Should_CallExpexted_When_Called(self, update_readme_patch, *patches):
+        logger_mock = Mock()
+        create_python_badge('--badge-filename--', logger_mock, True)
+        update_readme_patch.assert_called_once_with('python', '--badge-filename--', True, logger_mock)
