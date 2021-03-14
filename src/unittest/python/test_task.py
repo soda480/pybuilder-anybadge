@@ -422,7 +422,7 @@ class TestTask(unittest.TestCase):
         sys_patch.version_info.minor = '--minor--'
         result = get_python_badge()
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('python', value='--major--.--minor--', default_color='orange', num_padding_chars=1)
+        badge_patch.assert_called_once_with('python', value='--major--.--minor--', default_color='teal', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__update_readme_Should_CallExpected_When_AddToReadmeFalseAccessibleFalse(self, *patches):

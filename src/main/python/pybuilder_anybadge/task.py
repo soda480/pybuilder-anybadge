@@ -205,7 +205,7 @@ def get_python_badge():
     """ return badge for python version
     """
     value = f'{sys.version_info.major}.{sys.version_info.minor}'
-    color = 'orange'
+    color = 'teal'
     return Badge('python', value=value, default_color=color, num_padding_chars=1)
 
 
