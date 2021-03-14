@@ -399,15 +399,15 @@ class TestTask(unittest.TestCase):
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Yellow(self, badge_patch, *patches):
-        result = get_coverage_badge(84)
+        result = get_coverage_badge(84.234342342343)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('coverage', value='84%', default_color='yellow', num_padding_chars=1)
+        badge_patch.assert_called_once_with('coverage', value='84.23%', default_color='yellow', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Orange(self, badge_patch, *patches):
-        result = get_coverage_badge(69)
+        result = get_coverage_badge(69.13933332232)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('coverage', value='69%', default_color='orange', num_padding_chars=1)
+        badge_patch.assert_called_once_with('coverage', value='69.14%', default_color='orange', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Red(self, badge_patch, *patches):

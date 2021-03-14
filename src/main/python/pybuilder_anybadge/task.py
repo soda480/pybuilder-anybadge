@@ -197,7 +197,7 @@ def get_coverage_badge(coverage):
         color = 'orange'
     if coverage < 55:
         color = 'red'
-    value = f'{coverage}%'
+    value = f'{round(coverage, 2)}%'
     return Badge('coverage', value=value, default_color=color, num_padding_chars=1)
 
 
