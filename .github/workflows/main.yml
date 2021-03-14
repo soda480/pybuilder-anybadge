@@ -6,33 +6,25 @@ on:
   pull_request:
     branches:
       - master
-env:
-  CRYPTOGRAPHY_DONT_BUILD_RUST: 1
 
 jobs:
   build:
     runs-on: ubuntu-16.04
-    container: python:3.6-alpine
+    container: python:3.6-slim
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install required packages
-      run: apk --update --no-cache add gcc libc-dev libffi-dev openssl-dev
-
     - name: Install pybuilder
       run: pip install pybuilder
 
-    - name: Install dependencies
-      run: pyb install_dependencies
-
     - name: Execute build
-      run: pyb install
+      run: pyb
 
     - name: Install Codecov requirements
       run: |
-        apk update
-        apk add bash curl
+        apt-get update
+        apt-get install -y bash curl
         sed -e 's,filename="pybuilder-anybadge/,filename="src/main/python/pybuilder_anybadge/,g' target/reports/pybuilder-anybadge_coverage.xml > coverage.xml
 
     - name: Upload coverage to Codecov
