@@ -31,28 +31,27 @@ def anybadge(project, logger):
     exclude = get_badge_exclude(project)
     logger.debug(f'task instructed to exclude {exclude}')
     if 'complexity' not in exclude:
-        report_path = f'{reports_directory}/radon'
-        badge_path = f'{images_directory}/complexity.svg'
+        report_path = os.path.join(reports_directory, 'radon')
+        badge_path = os.path.join(images_directory, 'complexity.svg')
         use_average = project.get_property('anybadge_complexity_use_average')
         create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average)
     if 'severity' not in exclude:
-        report_path = f'{reports_directory}/bandit.json'
-        badge_path = f'{images_directory}/severity.svg'
+        report_path = os.path.join(reports_directory, 'bandit.json')
+        badge_path = os.path.join(images_directory, 'severity.svg')
         create_severity_badge(report_path, badge_path, logger, add_to_readme)
     if 'coverage' not in exclude:
-        report_path = f'{reports_directory}/coverage.json'
-        badge_path = f'{images_directory}/coverage.svg'
+        report_path = os.path.join(reports_directory, 'coverage.json')
+        badge_path = os.path.join(images_directory, 'coverage.svg')
         create_coverage_badge(report_path, badge_path, logger, add_to_readme)
     if 'python' not in exclude:
-        badge_path = f'{images_directory}/python.svg'
+        badge_path = os.path.join(images_directory, 'python.svg')
         create_python_badge(badge_path, logger, add_to_readme)
 
 
 def get_images_directory(project):
     """ return images directory and create directory if does not already exist
     """
-    target_directory = project.expand_path('$dir_target')
-    images_directory = target_directory.replace('/target', '/docs/images')
+    images_directory = os.path.join(project.basedir, 'docs', 'images')
     if not os.path.exists(images_directory):
         os.makedirs(images_directory)
     return images_directory
@@ -198,7 +197,7 @@ def get_coverage_badge(coverage):
         color = 'orange'
     if coverage < 55:
         color = 'red'
-    value = f'{coverage}%'
+    value = f'{round(coverage, 2)}%'
     return Badge('coverage', value=value, default_color=color, num_padding_chars=1)
 
 
@@ -210,7 +209,7 @@ def get_python_badge():
     return Badge('python', value=value, default_color=color, num_padding_chars=1)
 
 
-def update_readme(name, badge_filename, add_to_readme, logger):
+def update_readme(name, badge_path, add_to_readme, logger):
     """ add badge to readme
     """
     if not add_to_readme:
@@ -219,9 +218,8 @@ def update_readme(name, badge_filename, add_to_readme, logger):
     if not accessible(filename):
         logger.warn(f'{filename} does not exist or is not accessible')
         return
-    # not super clean but is the best we can do for now
-    relative_filename = f"docs/images{badge_filename.split('/docs/images')[1]}"
-    line_to_add = f'![{name}]({relative_filename})\n'
+    relative_path = os.path.join('docs', 'images', os.path.basename(badge_path))
+    line_to_add = f'![{name}]({relative_path})\n'
     with open('README.md', 'r+') as file_handler:
         lines = file_handler.readlines()
         for line in lines:
@@ -234,49 +232,49 @@ def update_readme(name, badge_filename, add_to_readme, logger):
             file_handler.writelines(lines)
 
 
-def create_complexity_badge(report_filename, badge_filename, logger, add_to_readme, use_average):
+def create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average):
     """ create complexity badge from radon report
     """
-    if not accessible(report_filename):
-        logger.warn(f'{report_filename} does not exist or is not accessible')
+    if not accessible(report_path):
+        logger.warn(f'{report_path} does not exist or is not accessible')
         return
-    lines = read_lines(report_filename)
+    lines = read_lines(report_path)
     report = get_complexity_report(lines)
     badge = get_complexity_badge(report, use_average=use_average)
-    logger.info(f'writing complexity badge {badge_filename}')
-    badge.write_badge(badge_filename, overwrite=True)
-    update_readme('complexity', badge_filename, add_to_readme, logger)
+    logger.info(f'writing complexity badge {badge_path}')
+    badge.write_badge(badge_path, overwrite=True)
+    update_readme('complexity', badge_path, add_to_readme, logger)
 
 
-def create_severity_badge(report_filename, badge_filename, logger, add_to_readme):
+def create_severity_badge(report_path, badge_path, logger, add_to_readme):
     """ create severity badge from bandit report
     """
-    if not accessible(report_filename):
-        logger.warn(f'{report_filename} does not exist or is not accessible')
+    if not accessible(report_path):
+        logger.warn(f'{report_path} does not exist or is not accessible')
         return
-    severity_report = read_data(report_filename)
+    severity_report = read_data(report_path)
     badge = get_severity_badge(severity_report)
-    logger.info(f'writing severity badge {badge_filename}')
-    badge.write_badge(badge_filename, overwrite=True)
-    update_readme('severity', badge_filename, add_to_readme, logger)
+    logger.info(f'writing severity badge {badge_path}')
+    badge.write_badge(badge_path, overwrite=True)
+    update_readme('severity', badge_path, add_to_readme, logger)
 
 
-def create_coverage_badge(report_filename, badge_filename, logger, add_to_readme):
+def create_coverage_badge(report_path, badge_path, logger, add_to_readme):
     """ create coverage badge from coverage report
     """
-    if not accessible(report_filename):
-        logger.warn(f'{report_filename} does not exist or is not accessible')
+    if not accessible(report_path):
+        logger.warn(f'{report_path} does not exist or is not accessible')
         return
-    data = read_data(report_filename)
+    data = read_data(report_path)
     coverage = get_coverage(data)
     badge = get_coverage_badge(coverage)
-    logger.info(f'writing coverage badge {badge_filename}')
-    badge.write_badge(badge_filename, overwrite=True)
-    update_readme('coverage', badge_filename, add_to_readme, logger)
+    logger.info(f'writing coverage badge {badge_path}')
+    badge.write_badge(badge_path, overwrite=True)
+    update_readme('coverage', badge_path, add_to_readme, logger)
 
 
-def create_python_badge(badge_filename, logger, add_to_readme):
+def create_python_badge(badge_path, logger, add_to_readme):
     badge = get_python_badge()
-    logger.info(f'writing python version badge {badge_filename}')
-    badge.write_badge(badge_filename, overwrite=True)
-    update_readme('python', badge_filename, add_to_readme, logger)
+    logger.info(f'writing python version badge {badge_path}')
+    badge.write_badge(badge_path, overwrite=True)
+    update_readme('python', badge_path, add_to_readme, logger)
