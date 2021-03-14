@@ -8,7 +8,6 @@ from pybuilder.core import Author
 
 use_plugin('python.core')
 use_plugin('python.unittest')
-use_plugin('python.install_dependencies')
 use_plugin('python.flake8')
 use_plugin('python.coverage')
 use_plugin('python.distutils')
@@ -20,8 +19,8 @@ name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'Pybuilder plugin for anybadge badge generator'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.2.0'
-default_task = ['clean', 'analyze', 'radon', 'bandit']
+version = '0.2.1'
+default_task = ['clean', 'radon', 'bandit', 'publish']
 license = 'Apache License, Version 2.0'
 description = summary
 
