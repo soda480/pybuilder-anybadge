@@ -14,7 +14,7 @@ use_plugin('pypi:pybuilder_anybadge')
 
 **NOTE** if you are using Pybuilder version `v0.11.x`, then specify the following version of the plugin:
 ```python
-use_plugin('pypi:pybuilder_anybadge', '~=0.1.2')
+use_plugin('pypi:pybuilder_anybadge', '~=0.1.3')
 ```
 
 ### Pybuilder anybadge properties ###
