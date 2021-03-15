@@ -23,6 +23,7 @@ from pybuilder_anybadge.task import create_complexity_badge
 from pybuilder_anybadge.task import create_severity_badge
 from pybuilder_anybadge.task import create_coverage_badge
 from pybuilder_anybadge.task import create_python_badge
+from pybuilder_anybadge.task import URL
 
 
 class TestTask(unittest.TestCase):
@@ -207,7 +208,7 @@ class TestTask(unittest.TestCase):
             'Average complexity: A (3.557377049180328)']
         result = get_complexity_report(report_lines)
         expected_result = {
-            'average': 3.557377049180328,
+            'average': 3.56,
             'highest': {
                 'name': 'class.ma',
                 'score': 14
@@ -243,7 +244,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Simple', default_color='green', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Simple (5)', default_color='green', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_StableGreen(self, badge_patch, *patches):
@@ -254,7 +255,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Stable', default_color='green', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Stable (10)', default_color='olive', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_SlightYellow(self, badge_patch, *patches):
@@ -265,7 +266,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Slight', default_color='yellow', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Slight (20)', default_color='yellow', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_ComplexOrange(self, badge_patch, *patches):
@@ -276,7 +277,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Complex', default_color='orange', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Complex (30)', default_color='orange', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_AlarmingRed(self, badge_patch, *patches):
@@ -287,7 +288,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Alarming', default_color='red', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Alarming (40)', default_color='red', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UnstableBrightred(self, badge_patch, *patches):
@@ -298,7 +299,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Unstable', default_color='brightred', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Unstable (50)', default_color='brightred', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UseAverage(self, badge_patch, *patches):
@@ -310,7 +311,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report, use_average=True)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Unstable', default_color='brightred', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Unstable (79)', default_color='brightred', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_severity_badge_Should_ReturnExpected_When_GrayUndefined(self, badge_patch, *patches):
@@ -448,11 +449,13 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
     @patch('pybuilder_anybadge.task.open', create=True)
     def test__update_readme_Should_CallExpected_When_Match(self, open_patch, *patches):
+        name = 'severity'
+        data = f"[![{name}](docs/images/{name}.svg)]({URL[name]})"
         open_patch.side_effect = [
-            mock_open(read_data='![severity](docs/images/severity.svg)\n').return_value
+            mock_open(read_data=f'{data}\n').return_value
         ]
         logger_mock = Mock()
-        update_readme('severity', '/pybuilder_anybadge/docs/images/severity.svg', True, logger_mock)
+        update_readme(name, f'/pybuilder_anybadge/docs/images/{name}.svg', True, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_complexity_badge_Should_CallExpected_When_NotAccessible(self, *patches):
