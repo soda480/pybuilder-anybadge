@@ -9,6 +9,12 @@ from pybuilder.core import depends
 
 from anybadge import Badge
 
+URL = {
+    'complexity': 'https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity',
+    'severity': 'https://pypi.org/project/bandit/',
+    'python': 'https://www.python.org/downloads/'
+}
+
 
 @init
 def init_anybadge(project):
@@ -101,16 +107,17 @@ def get_complexity_report(lines):
         line = line.strip()
         match = re.match(regex_score, line)
         if match:
-            score = float(match.group('score'))
+            score = round(float(match.group('score')))
             if score > report['highest']['score']:
                 report['highest']['score'] = score
                 report['highest']['name'] = match.group('name')
 
     last_line = lines[-1].strip()
     regex_average = r'Average complexity: [A-Z] \((?P<average>.*)\)'
-    match = re.match(regex_average, last_line)
-    if match:
-        report['average'] = float(match.group('average'))
+    match_average = re.match(regex_average, last_line)
+    if match_average:
+        average = match_average.group('average')
+        report['average'] = round(float(average), 2)
 
     return report
 
@@ -134,7 +141,7 @@ def get_complexity_badge(complexity_report, use_average=False):
         color = 'green'
     elif score <= 10:
         value = 'Stable'
-        color = 'green'
+        color = 'olive'
     elif score <= 20:
         value = 'Slight'
         color = 'yellow'
@@ -148,7 +155,7 @@ def get_complexity_badge(complexity_report, use_average=False):
         value = 'Unstable'
         color = 'brightred'
 
-    return Badge('complexity', value=value, default_color=color, num_padding_chars=1)
+    return Badge('complexity', value=f'{value} ({score})', default_color=color, num_padding_chars=1)
 
 
 def get_severity_badge(severity_report):
@@ -219,7 +226,8 @@ def update_readme(name, badge_path, add_to_readme, logger):
         logger.warn(f'{filename} does not exist or is not accessible')
         return
     relative_path = os.path.join('docs', 'images', os.path.basename(badge_path))
-    line_to_add = f'![{name}]({relative_path})\n'
+    url = URL.get(name, 'https://pybuilder.io/')
+    line_to_add = f"[![{name}]({relative_path})]({url})\n"
     with open('README.md', 'r+') as file_handler:
         lines = file_handler.readlines()
         for line in lines:
