@@ -244,7 +244,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Simple (5)', default_color='green', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Simple: 5', default_color='green', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_StableGreen(self, badge_patch, *patches):
@@ -255,7 +255,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Stable (10)', default_color='olive', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Stable: 10', default_color='olive', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_SlightYellow(self, badge_patch, *patches):
@@ -266,7 +266,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Slight (20)', default_color='yellow', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Slight: 20', default_color='yellow', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_ComplexOrange(self, badge_patch, *patches):
@@ -277,7 +277,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Complex (30)', default_color='orange', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Complex: 30', default_color='orange', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_AlarmingRed(self, badge_patch, *patches):
@@ -288,7 +288,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Alarming (40)', default_color='red', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Alarming: 40', default_color='red', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UnstableBrightred(self, badge_patch, *patches):
@@ -299,7 +299,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Unstable (50)', default_color='brightred', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Unstable: 50', default_color='brightred', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UseAverage(self, badge_patch, *patches):
@@ -311,7 +311,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report, use_average=True)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Unstable (79)', default_color='brightred', num_padding_chars=1)
+        badge_patch.assert_called_once_with('complexity', value='Unstable: 79', default_color='brightred', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_severity_badge_Should_ReturnExpected_When_GrayUndefined(self, badge_patch, *patches):
