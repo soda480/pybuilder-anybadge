@@ -155,7 +155,7 @@ def get_complexity_badge(complexity_report, use_average=False):
         value = 'Unstable'
         color = 'brightred'
 
-    return Badge('complexity', value=f'{value} ({score})', default_color=color, num_padding_chars=1)
+    return Badge('complexity', value=f'{value}: {score}', default_color=color, num_padding_chars=1)
 
 
 def get_severity_badge(severity_report):
@@ -240,49 +240,49 @@ def update_readme(name, badge_path, add_to_readme, logger):
             file_handler.writelines(lines)
 
 
+def write_badge_and_update_readme(name, badge, badge_path, logger, add_to_readme):
+    """ write badge and update readme
+    """
+    logger.info(f'writing coverage badge {badge_path}')
+    badge.write_badge(badge_path, overwrite=True)
+    update_readme(name, badge_path, add_to_readme, logger)
+
+
 def create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average):
     """ create complexity badge from radon report
     """
-    if not accessible(report_path):
-        logger.warn(f'{report_path} does not exist or is not accessible')
-        return
-    lines = read_lines(report_path)
-    report = get_complexity_report(lines)
-    badge = get_complexity_badge(report, use_average=use_average)
-    logger.info(f'writing complexity badge {badge_path}')
-    badge.write_badge(badge_path, overwrite=True)
-    update_readme('complexity', badge_path, add_to_readme, logger)
+    if accessible(report_path):
+        complexity_data = get_complexity_report(read_lines(report_path))
+        badge = get_complexity_badge(complexity_data, use_average=use_average)
+        write_badge_and_update_readme('complexity', badge, badge_path, logger, add_to_readme)
+    else:
+        logger.warn(f'{report_path} is not accessible')
 
 
 def create_severity_badge(report_path, badge_path, logger, add_to_readme):
     """ create severity badge from bandit report
     """
-    if not accessible(report_path):
-        logger.warn(f'{report_path} does not exist or is not accessible')
-        return
-    severity_report = read_data(report_path)
-    badge = get_severity_badge(severity_report)
-    logger.info(f'writing severity badge {badge_path}')
-    badge.write_badge(badge_path, overwrite=True)
-    update_readme('severity', badge_path, add_to_readme, logger)
+    if accessible(report_path):
+        severity_data = read_data(report_path)
+        badge = get_severity_badge(severity_data)
+        write_badge_and_update_readme('severity', badge, badge_path, logger, add_to_readme)
+    else:
+        logger.warn(f'{report_path} is not accessible')
 
 
 def create_coverage_badge(report_path, badge_path, logger, add_to_readme):
     """ create coverage badge from coverage report
     """
-    if not accessible(report_path):
-        logger.warn(f'{report_path} does not exist or is not accessible')
-        return
-    data = read_data(report_path)
-    coverage = get_coverage(data)
-    badge = get_coverage_badge(coverage)
-    logger.info(f'writing coverage badge {badge_path}')
-    badge.write_badge(badge_path, overwrite=True)
-    update_readme('coverage', badge_path, add_to_readme, logger)
+    if accessible(report_path):
+        coverage_data = get_coverage(read_data(report_path))
+        badge = get_coverage_badge(coverage_data)
+        write_badge_and_update_readme('coverage', badge, badge_path, logger, add_to_readme)
+    else:
+        logger.warn(f'{report_path} is not accessible')
 
 
 def create_python_badge(badge_path, logger, add_to_readme):
+    """ create python version badge
+    """
     badge = get_python_badge()
-    logger.info(f'writing python version badge {badge_path}')
-    badge.write_badge(badge_path, overwrite=True)
-    update_readme('python', badge_path, add_to_readme, logger)
+    write_badge_and_update_readme('python', badge, badge_path, logger, add_to_readme)
