@@ -1,7 +1,3 @@
-[![python](docs/images/python.svg)](https://www.python.org/downloads/)
-[![coverage](docs/images/coverage.svg)](https://pybuilder.io/)
-[![severity](docs/images/severity.svg)](https://pypi.org/project/bandit/)
-[![complexity](docs/images/complexity.svg)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
 [![GitHub Workflow Status](https://github.com/soda480/pybuilder-anybadge/workflows/build/badge.svg)](https://github.com/soda480/pybuilder-anybadge/actions)
 [![Code Coverage](https://codecov.io/gh/soda480/pybuilder-anybadge/branch/main/graph/badge.svg)](https://codecov.io/gh/soda480/pybuilder-anybadge)
 [![Code Grade](https://www.code-inspector.com/project/20103/status/svg)](https://frontend.code-inspector.com/project/20103/dashboard)
@@ -18,7 +14,7 @@ use_plugin('pypi:pybuilder_anybadge')
 
 **NOTE** if you are using Pybuilder version `v0.11.x`, then specify the following version of the plugin:
 ```python
-use_plugin('pypi:pybuilder_anybadge', '~=0.1.3')
+use_plugin('pypi:pybuilder_anybadge', '~=0.1.4')
 ```
 
 ### Pybuilder anybadge properties ###
