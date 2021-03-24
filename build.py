@@ -19,7 +19,7 @@ name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'Pybuilder plugin for anybadge badge generator'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.2.4'
+version = '0.2.5'
 default_task = ['clean', 'radon', 'bandit', 'publish']
 license = 'Apache License, Version 2.0'
 description = summary
@@ -52,6 +52,6 @@ def set_properties(project):
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Build Tools'])
     # only for functional testing plugin
-    # project.set_property('anybadge_exclude', 'severity,coverage')
+    # project.set_property('anybadge_exclude', 'severity, coverage')
     # project.set_property('anybadge_add_to_readme', True)
     # project.set_property('anybadge_complexity_use_average', True)
