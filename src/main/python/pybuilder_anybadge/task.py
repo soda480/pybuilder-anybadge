@@ -66,10 +66,12 @@ def get_images_directory(project):
 def get_badge_exclude(project):
     """ return list of badges to exclude
     """
+    exclusions = []
     exclude = project.get_property('anybadge_exclude')
     if exclude:
-        return exclude.split(',')
-    return []
+        items = exclude.split(',')
+        exclusions = [item.strip() for item in items]
+    return exclusions
 
 
 def accessible(filename):

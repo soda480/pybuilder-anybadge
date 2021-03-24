@@ -158,9 +158,9 @@ class TestTask(unittest.TestCase):
 
     def test__get_badge_exclude_Should_ReturnExpected_When_Exclude(self, *patches):
         project_mock = Mock()
-        project_mock.get_property.return_value = 'item1,item2'
+        project_mock.get_property.return_value = ' item1,  item2,item3,      item4'
         result = get_badge_exclude(project_mock)
-        expected_result = ['item1', 'item2']
+        expected_result = ['item1', 'item2', 'item3', 'item4']
         self.assertEqual(result, expected_result)
 
     def test__get_badge_exclude_Should_ReturnExpected_When_NoExclude(self, *patches):
