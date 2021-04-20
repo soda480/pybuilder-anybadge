@@ -5,7 +5,7 @@
 
 # pybuilder-anybadge #
 
-A pybuilder plugin that generates badges for your project using `anybadge`, for more information refer to the [anybadge pypi page](https://pypi.org/project/anybadge/).
+A pybuilder plugin that generates badges for your project. The plugin by default will create badges using `anybadge`, for more information refer to the [anybadge pypi page](https://pypi.org/project/anybadge/). The plugin can also be configured to generate the badges using `img.shields.io`.
 
 To add this plugin into your pybuilder project, add the following line near the top of your build.py:
 ```python
@@ -14,7 +14,7 @@ use_plugin('pypi:pybuilder_anybadge')
 
 **NOTE** if you are using Pybuilder version `v0.11.x`, then specify the following version of the plugin:
 ```python
-use_plugin('pypi:pybuilder_anybadge', '~=0.1.5')
+use_plugin('pypi:pybuilder_anybadge', '~=0.1.6')
 ```
 
 ### Pybuilder anybadge properties ###
@@ -30,23 +30,32 @@ The plugin will write the respective badges to the `docs/images` folder. The fol
 Name | Type | Default Value | Description
 -- | -- | -- | --
 anybadge_exclude | str | '' | Comma delimited string of badges to exclude from processing, valid values are 'complexity', 'vulnerabilities', 'coverage' and 'python'
-anybadge_add_to_readme | bool | False | Specify if plugin should add badges to the README.md file (see below for example). **Note** the plugin will add the badge references but you must commit/push the changes (including svg files in the docs/images folder)
 anybadge_complexity_use_average | bool | False | Use overall average complexity as score when generating complexity badge
+anybadge_use_shields | bool | False | Will use `img.shields.io` to create the badges instead of `anybadge`
+
+**Note** the plugin will add the badge references but you must commit/push the changes (including svg files in the docs/images folder
 
 The plugin properties are set using `project.set_property`, the following is an example of how to set the properties:
 
 ```Python
-project.set_property('anybadge_exclude', 'vulnerabilities,coverage')
-project.set_property('anybadge_add_to_readme', True)
+project.set_property('anybadge_exclude', 'vulnerabilities, coverage')
 project.set_property('anybadge_complexity_use_average', False)
+project.set_property('anybadge_use_shields', False)
 ```
 
-The following badges were generated for this project using the `pybuilder_anybadge` plugin:
+By default the plugin will use `anybadge` to create the badges and save them as svg files in the `docs\images` folder:
 
-![coverage](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/coverage.svg)
-![vulnerabilities](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/vulnerabilities.svg)
-![complexity](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/complexity.svg)
-![python](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/python.svg)
+![coverage](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/0.1/docs/images/coverage.svg)
+![complexity](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/0.1/docs/images/complexity.svg)
+![vulnerabilities](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/0.1/docs/images/vulnerabilities.svg)
+![python](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/0.1/docs/images/python.svg)
+
+However, setting `anybadge_use_shields` to `True` will render the badges using `img.shields.io`:
+
+[![coverage](https://img.shields.io/badge/coverage-87.8%25-green)](https://pybuilder.io/)
+[![complexity](https://img.shields.io/badge/complexity-Stable:%208-olive)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
+[![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-green)](https://pypi.org/project/bandit/)
+[![python](https://img.shields.io/badge/python-3.6-teal)](https://www.python.org/downloads/)
 
 ### Development ###
 

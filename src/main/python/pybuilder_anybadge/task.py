@@ -22,8 +22,8 @@ def init_anybadge(project):
     """
     project.plugin_depends_on('anybadge')
     project.set_property_if_unset('anybadge_exclude', [])
-    project.set_property_if_unset('anybadge_add_to_readme', False)
     project.set_property_if_unset('anybadge_complexity_use_average', False)
+    project.set_property_if_unset('anybadge_use_shields', False)
 
 
 @task('anybadge', description='generate badges from reports using anybadge')
@@ -33,25 +33,25 @@ def anybadge(project, logger):
     """
     reports_directory = project.expand_path('$dir_reports')
     images_directory = get_images_directory(project)
-    add_to_readme = project.get_property('anybadge_add_to_readme')
+    use_shields = project.get_property('anybadge_use_shields')
     exclude = get_badge_exclude(project)
     logger.debug(f'task instructed to exclude {exclude}')
+    if 'python' not in exclude:
+        badge_path = os.path.join(images_directory, 'python.svg')
+        create_python_badge(badge_path, logger, use_shields=use_shields)
+    if 'vulnerabilities' not in exclude:
+        report_path = os.path.join(reports_directory, 'bandit.json')
+        badge_path = os.path.join(images_directory, 'vulnerabilities.svg')
+        create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=use_shields)
     if 'complexity' not in exclude:
         report_path = os.path.join(reports_directory, 'radon')
         badge_path = os.path.join(images_directory, 'complexity.svg')
         use_average = project.get_property('anybadge_complexity_use_average')
-        create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average)
-    if 'vulnerabilities' not in exclude:
-        report_path = os.path.join(reports_directory, 'bandit.json')
-        badge_path = os.path.join(images_directory, 'vulnerabilities.svg')
-        create_vulnerabilities_badge(report_path, badge_path, logger, add_to_readme)
+        create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=use_shields)
     if 'coverage' not in exclude:
         report_path = os.path.join(reports_directory, 'coverage.json')
         badge_path = os.path.join(images_directory, 'coverage.svg')
-        create_coverage_badge(report_path, badge_path, logger, add_to_readme)
-    if 'python' not in exclude:
-        badge_path = os.path.join(images_directory, 'python.svg')
-        create_python_badge(badge_path, logger, add_to_readme)
+        create_coverage_badge(report_path, badge_path, logger, use_shields=use_shields)
 
 
 def get_images_directory(project):
@@ -124,7 +124,7 @@ def get_complexity_report(lines):
     return report
 
 
-def get_complexity_badge(complexity_report, use_average=False):
+def get_complexity_badge(complexity_report, use_average=False, use_shields=False):
     """ return complexity badge based off of complexity_report
         https://radon.readthedocs.io/en/latest/api.html#radon.complexity.cc_rank
         1  - 5  : Simple   - Green
@@ -157,10 +157,15 @@ def get_complexity_badge(complexity_report, use_average=False):
         value = 'Unstable'
         color = 'brightred'
 
-    return Badge('complexity', value=f'{value}: {score}', default_color=color, num_padding_chars=1)
+    if use_shields:
+        badge = f'https://img.shields.io/badge/complexity-{value}: {score}-{color}'
+        badge = badge.replace(' ', '%20')
+    else:
+        badge = Badge('complexity', value=f'{value}: {score}', default_color=color)
+    return badge
 
 
-def get_vulnerabilities_badge(vulnerabilities_report):
+def get_vulnerabilities_badge(vulnerabilities_report, use_shields=False):
     """ return vulnerabilities badge based off of vulnerabilities_report
         High      - Red
         Medium    - Orange
@@ -185,7 +190,11 @@ def get_vulnerabilities_badge(vulnerabilities_report):
         color = 'red'
         value = 'High'
 
-    return Badge('vulnerabilities', value=value, default_color=color, num_padding_chars=1)
+    if use_shields:
+        badge = f'https://img.shields.io/badge/vulnerabilities-{value}-{color}'
+    else:
+        badge = Badge('vulnerabilities', value=value, default_color=color)
+    return badge
 
 
 def get_coverage(coverage_data):
@@ -196,7 +205,7 @@ def get_coverage(coverage_data):
     return coverage_data['overall_coverage']
 
 
-def get_coverage_badge(coverage):
+def get_coverage_badge(coverage, use_shields=False):
     """ return coverage badge based off of coverage report
     """
     color = 'green'
@@ -207,29 +216,34 @@ def get_coverage_badge(coverage):
     if coverage < 55:
         color = 'red'
     value = f'{round(coverage, 2)}%'
-    return Badge('coverage', value=value, default_color=color, num_padding_chars=1)
+    if use_shields:
+        badge = f'https://img.shields.io/badge/coverage-{value}-{color}'
+        badge = badge.replace('%', '%25')
+    else:
+        badge = Badge('coverage', value=value, default_color=color)
+    return badge
 
 
-def get_python_badge():
+def get_python_badge(use_shields=False):
     """ return badge for python version
     """
     value = f'{sys.version_info.major}.{sys.version_info.minor}'
     color = 'teal'
-    return Badge('python', value=value, default_color=color, num_padding_chars=1)
+    if use_shields:
+        badge = f'https://img.shields.io/badge/python-{value}-{color}'
+    else:
+        badge = Badge('python', value=value, default_color=color)
+    return badge
 
 
-def update_readme(name, badge_path, add_to_readme, logger):
+def update_readme(line_to_add, logger):
     """ add badge to readme
     """
-    if not add_to_readme:
-        return
     filename = 'README.md'
     if not accessible(filename):
         logger.warn(f'{filename} does not exist or is not accessible')
         return
-    relative_path = os.path.join('docs', 'images', os.path.basename(badge_path))
-    url = URL.get(name, 'https://pybuilder.io/')
-    line_to_add = f"[![{name}]({relative_path})]({url})\n"
+
     with open('README.md', 'r+') as file_handler:
         lines = file_handler.readlines()
         for line in lines:
@@ -242,49 +256,74 @@ def update_readme(name, badge_path, add_to_readme, logger):
             file_handler.writelines(lines)
 
 
-def write_badge_and_update_readme(name, badge, badge_path, logger, add_to_readme):
-    """ write badge and update readme
+def get_line_to_add(name, badge, badge_is_url):
+    """ return line to add in markdown
     """
-    logger.info(f'writing coverage badge {badge_path}')
-    badge.write_badge(badge_path, overwrite=True)
-    update_readme(name, badge_path, add_to_readme, logger)
+    url = URL.get(name, 'https://pybuilder.io/')
+    if badge_is_url:
+        line_to_add = f"[![{name}]({badge})]({url})\n"
+    else:
+        relative_path = os.path.join('docs', 'images', os.path.basename(badge))
+        line_to_add = f"[![{name}]({relative_path})]({url})\n"
+    return line_to_add
 
 
-def create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average):
+def create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=False):
     """ create complexity badge from radon report
     """
     if accessible(report_path):
         complexity_data = get_complexity_report(read_lines(report_path))
-        badge = get_complexity_badge(complexity_data, use_average=use_average)
-        write_badge_and_update_readme('complexity', badge, badge_path, logger, add_to_readme)
+        badge = get_complexity_badge(complexity_data, use_average=use_average, use_shields=use_shields)
+        if use_shields:
+            line_to_add = get_line_to_add('complexity', badge, use_shields)
+        else:
+            badge.write_badge(badge_path, overwrite=True)
+            line_to_add = get_line_to_add('complexity', badge_path, use_shields)
+        update_readme(line_to_add, logger)
+
     else:
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_vulnerabilities_badge(report_path, badge_path, logger, add_to_readme):
+def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=False):
     """ create vulnerabilities badge from bandit report
     """
     if accessible(report_path):
         vulnerabilities_data = read_data(report_path)
-        badge = get_vulnerabilities_badge(vulnerabilities_data)
-        write_badge_and_update_readme('vulnerabilities', badge, badge_path, logger, add_to_readme)
+        badge = get_vulnerabilities_badge(vulnerabilities_data, use_shields=use_shields)
+        if use_shields:
+            line_to_add = get_line_to_add('vulnerabilities', badge, use_shields)
+        else:
+            badge.write_badge(badge_path, overwrite=True)
+            line_to_add = get_line_to_add('vulnerabilities', badge_path, use_shields)
+        update_readme(line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_coverage_badge(report_path, badge_path, logger, add_to_readme):
+def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
     """ create coverage badge from coverage report
     """
     if accessible(report_path):
         coverage_data = get_coverage(read_data(report_path))
-        badge = get_coverage_badge(coverage_data)
-        write_badge_and_update_readme('coverage', badge, badge_path, logger, add_to_readme)
+        badge = get_coverage_badge(coverage_data, use_shields=use_shields)
+        if use_shields:
+            line_to_add = get_line_to_add('coverage', badge, use_shields)
+        else:
+            badge.write_badge(badge_path, overwrite=True)
+            line_to_add = get_line_to_add('coverage', badge_path, use_shields)
+        update_readme(line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_python_badge(badge_path, logger, add_to_readme):
+def create_python_badge(badge_path, logger, use_shields=False):
     """ create python version badge
     """
-    badge = get_python_badge()
-    write_badge_and_update_readme('python', badge, badge_path, logger, add_to_readme)
+    badge = get_python_badge(use_shields=use_shields)
+    if use_shields:
+        line_to_add = get_line_to_add('python', badge, use_shields)
+    else:
+        badge.write_badge(badge_path, overwrite=True)
+        line_to_add = get_line_to_add('python', badge_path, use_shields)
+    update_readme(line_to_add, logger)
