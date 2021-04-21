@@ -1,3 +1,7 @@
+[![coverage](docs/images/coverage.svg)](https://pybuilder.io/)
+[![complexity](docs/images/complexity.svg)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
+[![vulnerabilities](docs/images/vulnerabilities.svg)](https://pypi.org/project/bandit/)
+[![python](docs/images/python.svg)](https://www.python.org/downloads/)
 [![GitHub Workflow Status](https://github.com/soda480/pybuilder-anybadge/workflows/build/badge.svg)](https://github.com/soda480/pybuilder-anybadge/actions)
 [![Code Coverage](https://codecov.io/gh/soda480/pybuilder-anybadge/branch/main/graph/badge.svg)](https://codecov.io/gh/soda480/pybuilder-anybadge)
 [![Code Grade](https://www.code-inspector.com/project/20103/status/svg)](https://frontend.code-inspector.com/project/20103/dashboard)
@@ -30,14 +34,14 @@ The plugin will write the respective badges to the `docs/images` folder. The fol
 Name | Type | Default Value | Description
 -- | -- | -- | --
 anybadge_exclude | str | '' | Comma delimited string of badges to exclude from processing, valid values are 'complexity', 'vulnerabilities', 'coverage' and 'python'
-anybadge_add_to_readme | bool | False | Specify if plugin should add badges to the README.md file (see below for example). **Note** the plugin will add the badge references but you must commit/push the changes (including svg files in the docs/images folder)
 anybadge_complexity_use_average | bool | False | Use overall average complexity as score when generating complexity badge
+
+**Note** the plugin will add the badge references but you must commit/push the changes (including svg files in the docs/images folder)
 
 The plugin properties are set using `project.set_property`, the following is an example of how to set the properties:
 
 ```Python
 project.set_property('anybadge_exclude', 'vulnerabilities,coverage')
-project.set_property('anybadge_add_to_readme', True)
 project.set_property('anybadge_complexity_use_average', True)
 ```
 

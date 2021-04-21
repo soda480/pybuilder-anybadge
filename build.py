@@ -53,5 +53,4 @@ def set_properties(project):
         'Topic :: Software Development :: Build Tools'])
     # only for functional testing plugin
     # project.set_property('anybadge_exclude', 'vulnerabilities, coverage')
-    project.set_property('anybadge_add_to_readme', True)
     # project.set_property('anybadge_complexity_use_average', True)

@@ -42,7 +42,6 @@ class TestTask(unittest.TestCase):
         project_mock = Mock()
         init_anybadge(project_mock)
         self.assertTrue(call('anybadge_exclude', []) in project_mock.set_property_if_unset.mock_calls)
-        self.assertTrue(call('anybadge_add_to_readme', False) in project_mock.set_property_if_unset.mock_calls)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -58,9 +57,9 @@ class TestTask(unittest.TestCase):
         logger_mock = Mock()
         anybadge(project_mock, logger_mock, Mock())
         create_complexity_badge_patch.assert_not_called()
-        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, project_mock.get_property.return_value)
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, project_mock.get_property.return_value)
-        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, project_mock.get_property.return_value)
+        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock)
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -72,14 +71,14 @@ class TestTask(unittest.TestCase):
         get_images_directory_patch.return_value = '/project/docs/images'
         get_badge_exclude_patch.return_value = ['vulnerabilities']
         project_mock = Mock()
-        project_mock.get_property.side_effect = [True, True]
+        project_mock.get_property.side_effect = [True]
         project_mock.expand_path.return_value = '/project/dir/reports'
         logger_mock = Mock()
         anybadge(project_mock, logger_mock, Mock())
-        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, True, True)
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, True)
         create_vulnerabilities_badge_patch.assert_not_called()
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, True)
-        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, True)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock)
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -91,14 +90,14 @@ class TestTask(unittest.TestCase):
         get_images_directory_patch.return_value = '/project/docs/images'
         get_badge_exclude_patch.return_value = ['coverage']
         project_mock = Mock()
-        project_mock.get_property.side_effect = [False, False]
+        project_mock.get_property.side_effect = [False]
         project_mock.expand_path.return_value = '/project/dir/reports'
         logger_mock = Mock()
         anybadge(project_mock, logger_mock, Mock())
-        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, False)
-        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, False)
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False)
+        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock)
         create_coverage_badge_patch.assert_not_called()
-        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, False)
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -110,13 +109,13 @@ class TestTask(unittest.TestCase):
         get_images_directory_patch.return_value = '/project/docs/images'
         get_badge_exclude_patch.return_value = ['python']
         project_mock = Mock()
-        project_mock.get_property.side_effect = [False, False]
+        project_mock.get_property.side_effect = [False]
         project_mock.expand_path.return_value = '/project/dir/reports'
         logger_mock = Mock()
         anybadge(project_mock, logger_mock, Mock())
-        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, False)
-        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, False)
-        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, False)
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False)
+        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock)
         create_python_badge_patch.assert_not_called()
 
     @patch('pybuilder_anybadge.task.get_images_directory')
@@ -426,15 +425,9 @@ class TestTask(unittest.TestCase):
         badge_patch.assert_called_once_with('python', value='--major--.--minor--', default_color='teal', num_padding_chars=1)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
-    def test__update_readme_Should_CallExpected_When_AddToReadmeFalseAccessibleFalse(self, *patches):
-        logger_mock = Mock()
-        update_readme('--name--', '--filename--', False, logger_mock)
-        logger_mock.warn.assert_not_called()
-
-    @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__update_readme_Should_CallExpected_When_AddToReadmeTrueAccessibleFalse(self, *patches):
         logger_mock = Mock()
-        update_readme('--name--', '--filename--', True, logger_mock)
+        update_readme('--name--', '--filename--', logger_mock)
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
@@ -444,7 +437,7 @@ class TestTask(unittest.TestCase):
             mock_open(read_data='--data--').return_value
         ]
         logger_mock = Mock()
-        update_readme('--name--', '/pybuilder_anybadge/docs/images/vulnerabilities.svg', True, logger_mock)
+        update_readme('--name--', '/pybuilder_anybadge/docs/images/vulnerabilities.svg', logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
     @patch('pybuilder_anybadge.task.open', create=True)
@@ -455,12 +448,12 @@ class TestTask(unittest.TestCase):
             mock_open(read_data=f'{data}\n').return_value
         ]
         logger_mock = Mock()
-        update_readme(name, f'/pybuilder_anybadge/docs/images/{name}.svg', True, logger_mock)
+        update_readme(name, f'/pybuilder_anybadge/docs/images/{name}.svg', logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_complexity_badge_Should_CallExpected_When_NotAccessible(self, *patches):
         logger_mock = Mock()
-        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True, False)
+        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, False)
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
@@ -470,13 +463,13 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_complexity_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, *patches):
         logger_mock = Mock()
-        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True, False)
-        update_readme_patch.assert_called_once_with('complexity', '--badge-filename--', True, logger_mock)
+        create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, False)
+        update_readme_patch.assert_called_once_with('complexity', '--badge-filename--', logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_vulnerabilities_badge_Should_CallExpected_When_NotAccessible(self, *patches):
         logger_mock = Mock()
-        create_vulnerabilities_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        create_vulnerabilities_badge('--report-filename--', '--badge-filename--', logger_mock)
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
@@ -485,13 +478,13 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_vulnerabilities_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, *patches):
         logger_mock = Mock()
-        create_vulnerabilities_badge('--report-filename--', '--badge-filename--', logger_mock, True)
-        update_readme_patch.assert_called_once_with('vulnerabilities', '--badge-filename--', True, logger_mock)
+        create_vulnerabilities_badge('--report-filename--', '--badge-filename--', logger_mock)
+        update_readme_patch.assert_called_once_with('vulnerabilities', '--badge-filename--', logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_coverage_badge_Should_CallExpected_When_NotAccessible(self, *patches):
         logger_mock = Mock()
-        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
+        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock)
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
@@ -501,12 +494,12 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_coverage_badge_Should_CallExpected_When_AccessibleCoverage(self, update_readme_patch, *patches):
         logger_mock = Mock()
-        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, True)
-        update_readme_patch.assert_called_once_with('coverage', '--badge-filename--', True, logger_mock)
+        create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock)
+        update_readme_patch.assert_called_once_with('coverage', '--badge-filename--', logger_mock)
 
     @patch('pybuilder_anybadge.task.get_python_badge')
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_python_badge_Should_CallExpexted_When_Called(self, update_readme_patch, *patches):
         logger_mock = Mock()
-        create_python_badge('--badge-filename--', logger_mock, True)
-        update_readme_patch.assert_called_once_with('python', '--badge-filename--', True, logger_mock)
+        create_python_badge('--badge-filename--', logger_mock)
+        update_readme_patch.assert_called_once_with('python', '--badge-filename--', logger_mock)
