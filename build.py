@@ -4,7 +4,7 @@ from pybuilder.core import init
 from pybuilder.core import Author
 
 # only for functional testing plugin
-from pybuilder_anybadge import anybadge
+# from pybuilder_anybadge import anybadge
 
 use_plugin('python.core')
 use_plugin('python.unittest')
@@ -54,3 +54,4 @@ def set_properties(project):
     # only for functional testing plugin
     # project.set_property('anybadge_exclude', 'vulnerabilities, coverage')
     # project.set_property('anybadge_complexity_use_average', True)
+    # project.set_property('anybadge_use_shields', True)
