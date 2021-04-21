@@ -11,7 +11,7 @@ from anybadge import Badge
 
 URL = {
     'complexity': 'https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity',
-    'severity': 'https://pypi.org/project/bandit/',
+    'vulnerabilities': 'https://pypi.org/project/bandit/',
     'python': 'https://www.python.org/downloads/'
 }
 
@@ -36,22 +36,22 @@ def anybadge(project, logger, reactor):
     add_to_readme = project.get_property('anybadge_add_to_readme')
     exclude = get_badge_exclude(project)
     logger.debug(f'task instructed to exclude {exclude}')
+    if 'python' not in exclude:
+        badge_path = os.path.join(images_directory, 'python.svg')
+        create_python_badge(badge_path, logger, add_to_readme)
+    if 'vulnerabilities' not in exclude:
+        report_path = os.path.join(reports_directory, 'bandit.json')
+        badge_path = os.path.join(images_directory, 'vulnerabilities.svg')
+        create_vulnerabilities_badge(report_path, badge_path, logger, add_to_readme)
     if 'complexity' not in exclude:
         report_path = os.path.join(reports_directory, 'radon')
         badge_path = os.path.join(images_directory, 'complexity.svg')
         use_average = project.get_property('anybadge_complexity_use_average')
         create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_average)
-    if 'severity' not in exclude:
-        report_path = os.path.join(reports_directory, 'bandit.json')
-        badge_path = os.path.join(images_directory, 'severity.svg')
-        create_severity_badge(report_path, badge_path, logger, add_to_readme)
     if 'coverage' not in exclude:
         report_path = os.path.join(reports_directory, f'{project.name}_coverage.json')
         badge_path = os.path.join(images_directory, 'coverage.svg')
         create_coverage_badge(report_path, badge_path, logger, add_to_readme)
-    if 'python' not in exclude:
-        badge_path = os.path.join(images_directory, 'python.svg')
-        create_python_badge(badge_path, logger, add_to_readme)
 
 
 def get_images_directory(project):
@@ -159,8 +159,8 @@ def get_complexity_badge(complexity_report, use_average=False):
     return Badge('complexity', value=f'{value}: {score}', default_color=color, num_padding_chars=1)
 
 
-def get_severity_badge(severity_report):
-    """ return severity badge based off of severity_report
+def get_vulnerabilities_badge(vulnerabilities_report):
+    """ return vulnerabilities badge based off of vulnerabilities_report
         High      - Red
         Medium    - Orange
         Low       - Yellow
@@ -170,7 +170,7 @@ def get_severity_badge(severity_report):
     color = 'green'
     value = 'None'
 
-    metrics = severity_report['metrics']['_totals']
+    metrics = vulnerabilities_report['metrics']['_totals']
     if metrics['SEVERITY.UNDEFINED'] > 0:
         color = 'gray'
         value = 'Undefined'
@@ -184,7 +184,7 @@ def get_severity_badge(severity_report):
         color = 'red'
         value = 'High'
 
-    return Badge('severity', value=value, default_color=color, num_padding_chars=1)
+    return Badge('vulnerabilities', value=value, default_color=color, num_padding_chars=1)
 
 
 def get_coverage(coverage_data):
@@ -260,13 +260,13 @@ def create_complexity_badge(report_path, badge_path, logger, add_to_readme, use_
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_severity_badge(report_path, badge_path, logger, add_to_readme):
-    """ create severity badge from bandit report
+def create_vulnerabilities_badge(report_path, badge_path, logger, add_to_readme):
+    """ create vulnerabilities badge from bandit report
     """
     if accessible(report_path):
-        severity_data = read_data(report_path)
-        badge = get_severity_badge(severity_data)
-        write_badge_and_update_readme('severity', badge, badge_path, logger, add_to_readme)
+        vulnerabilities_data = read_data(report_path)
+        badge = get_vulnerabilities_badge(vulnerabilities_data)
+        write_badge_and_update_readme('vulnerabilities', badge, badge_path, logger, add_to_readme)
     else:
         logger.warn(f'{report_path} is not accessible')
 

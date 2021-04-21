@@ -4,7 +4,7 @@ from pybuilder.core import init
 from pybuilder.core import Author
 
 # only for functional testing plugin
-# from pybuilder_anybadge import anybadge
+from pybuilder_anybadge import anybadge
 
 use_plugin('python.core')
 use_plugin('python.unittest')
@@ -17,9 +17,9 @@ use_plugin('pypi:pybuilder_bandit')
 
 name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
-summary = 'Pybuilder plugin for anybadge badge generator'
+summary = 'A pybuilder plugin that generates badges for your project'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.2.5'
+version = '0.2.6'
 default_task = ['clean', 'radon', 'bandit', 'publish']
 license = 'Apache License, Version 2.0'
 description = summary
@@ -52,6 +52,6 @@ def set_properties(project):
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Build Tools'])
     # only for functional testing plugin
-    # project.set_property('anybadge_exclude', 'severity, coverage')
-    # project.set_property('anybadge_add_to_readme', True)
+    # project.set_property('anybadge_exclude', 'vulnerabilities, coverage')
+    project.set_property('anybadge_add_to_readme', True)
     # project.set_property('anybadge_complexity_use_average', True)
