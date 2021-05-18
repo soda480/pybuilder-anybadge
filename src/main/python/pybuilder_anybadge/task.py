@@ -12,7 +12,8 @@ from anybadge import Badge
 URL = {
     'complexity': 'https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity',
     'vulnerabilities': 'https://pypi.org/project/bandit/',
-    'python': 'https://www.python.org/downloads/'
+    'python': 'https://www.python.org/downloads/',
+    'pylint': 'https://pypi.org/project/pylint/'
 }
 
 
@@ -52,6 +53,10 @@ def anybadge(project, logger, reactor):
         report_path = os.path.join(reports_directory, f'{project.name}_coverage.json')
         badge_path = os.path.join(images_directory, 'coverage.svg')
         create_coverage_badge(report_path, badge_path, logger, use_shields=use_shields)
+    if 'pylint' not in exclude:
+        report_path = os.path.join(reports_directory, 'pylint')
+        badge_path = os.path.join(images_directory, 'pylint.svg')
+        create_pylint_badge(report_path, badge_path, logger, use_shields=use_shields)
 
 
 def get_images_directory(project):
@@ -84,6 +89,12 @@ def read_lines(filename):
     """
     with open(filename) as infile:
         return infile.readlines()
+
+def read_file(filename):
+    """ return content of filename as a string
+    """
+    with open(filename) as infile:
+        return infile.read()
 
 
 def read_data(filename):
@@ -235,6 +246,36 @@ def get_python_badge(use_shields=False):
     return badge
 
 
+def get_pylint_report(lines):
+    """ return pylint score from pylint report
+    """
+    score = None
+    regex_pattern = r'(?<=Your code has been rated at ).*?(?=\/)'
+    match = re.search(regex_pattern, lines)
+    if match:
+        score = match.group()
+    return score
+
+
+def get_pylint_badge(pylint_score, use_shields=False):
+    """ return pylint badge based on pylint score
+    """
+    color = 'green'
+    value = pylint_score
+    if pylint_score < 9:
+        color = 'yellow'
+    if pylint_score < 7:
+        color = 'orange'
+    if pylint_score < 5:
+        color = 'red'
+
+    if use_shields:
+        badge = f'https://img.shields.io/badge/pylint-{value}-{color}'
+    else:
+        badge = Badge('pylint', value=value, default_color=color)
+    return badge
+
+
 def update_readme(line_to_add, logger):
     """ add badge to readme
     """
@@ -325,3 +366,19 @@ def create_python_badge(badge_path, logger, use_shields=False):
         badge.write_badge(badge_path, overwrite=True)
         line_to_add = get_line_to_add('python', badge_path, use_shields)
     update_readme(line_to_add, logger)
+
+
+def create_pylint_badge(report_path, badge_path, logger, use_shields=False):
+    """ create pylint badge from pylint report
+    """
+    if accessible(report_path):
+        pylint_data = get_pylint_report(read_file(report_path))
+        badge = get_pylint_badge(float(pylint_data), use_shields=use_shields)
+        if use_shields:
+            line_to_add = get_line_to_add('pylint', badge, use_shields)
+        else:
+            badge.write_badge(badge_path, overwrite=True)
+            line_to_add = get_line_to_add('pylint', badge_path, use_shields)
+        update_readme(line_to_add, logger)
+    else:
+        logger.warn(f'{report_path} is not accessible')
