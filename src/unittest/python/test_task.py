@@ -323,7 +323,7 @@ class TestTask(unittest.TestCase):
             }
         }
         result = get_complexity_badge(complexity_report, use_shields=True)
-        expected_result = 'https://img.shields.io/badge/complexity-Simple:%205-green'
+        expected_result = 'https://img.shields.io/badge/complexity-Simple:%205-brightgreen'
         self.assertEqual(result, expected_result)
 
     @patch('pybuilder_anybadge.task.Badge')

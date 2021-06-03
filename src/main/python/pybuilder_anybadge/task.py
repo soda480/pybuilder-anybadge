@@ -126,8 +126,8 @@ def get_complexity_report(lines):
 def get_complexity_badge(complexity_report, use_average=False, use_shields=False):
     """ return complexity badge based off of complexity_report
         https://radon.readthedocs.io/en/latest/api.html#radon.complexity.cc_rank
-        1  - 5  : Simple   - Green
-        6  - 10 : Stable   - Green
+        1  - 5  : Simple   - BrightGreen
+        6  - 10 : Stable   - Olive
         11 - 20 : Slight   - Yellow
         21 - 30 : Complex  - Orange
         31 - 40 : Alarming - Red
@@ -139,7 +139,10 @@ def get_complexity_badge(complexity_report, use_average=False, use_shields=False
 
     if score <= 5:
         value = 'Simple'
-        color = 'green'
+        if use_shields:
+            color = 'brightgreen'
+        else:
+            color = 'green'
     elif score <= 10:
         value = 'Stable'
         color = 'olive'
@@ -170,9 +173,12 @@ def get_vulnerabilities_badge(vulnerabilities_report, use_shields=False):
         Medium    - Orange
         Low       - Yellow
         Undefined - Gray
-        None      - Green
+        None      - BrightGreen
     """
-    color = 'green'
+    if use_shields:
+        color = 'brightgreen'
+    else:
+        color = 'green'
     value = 'None'
 
     metrics = vulnerabilities_report['metrics']['_totals']
@@ -207,7 +213,10 @@ def get_coverage(coverage_data):
 def get_coverage_badge(coverage, use_shields=False):
     """ return coverage badge based off of coverage report
     """
-    color = 'green'
+    if use_shields:
+        color = 'brightgreen'
+    else:
+        color = 'green'
     if coverage < 85:
         color = 'yellow'
     if coverage < 70:
