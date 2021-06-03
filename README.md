@@ -46,15 +46,15 @@ project.set_property('anybadge_use_shields', False)
 By default the plugin will use `anybadge` to create the badges and save them as svg files in the `docs\images` folder:
 
 ![coverage](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/coverage.svg)
-![vulnerabilities](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/vulnerabilities.svg)
 ![complexity](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/complexity.svg)
+![vulnerabilities](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/vulnerabilities.svg)
 ![python](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/python.svg)
 
 However, setting `anybadge_use_shields` to `True` will render the badges using `img.shields.io`:
 
-[![coverage](https://img.shields.io/badge/coverage-87.8%25-green)](https://pybuilder.io/)
-[![complexity](https://img.shields.io/badge/complexity-Stable:%208-olive)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
-[![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-green)](https://pypi.org/project/bandit/)
+[![coverage](https://img.shields.io/badge/coverage-100.0%25-brightgreen)](https://pybuilder.io/)
+[![complexity](https://img.shields.io/badge/complexity-Stable:%209-olive)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
+[![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-brightgreen)](https://pypi.org/project/bandit/)
 [![python](https://img.shields.io/badge/python-3.6-teal)](https://www.python.org/downloads/)
 
 ### Development ###
