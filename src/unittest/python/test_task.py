@@ -24,6 +24,9 @@ from pybuilder_anybadge.task import create_complexity_badge
 from pybuilder_anybadge.task import create_vulnerabilities_badge
 from pybuilder_anybadge.task import create_coverage_badge
 from pybuilder_anybadge.task import create_python_badge
+from pybuilder_anybadge.task import create_pylint_badge
+from pybuilder_anybadge.task import get_pylint_report
+from pybuilder_anybadge.task import get_pylint_badge
 from pybuilder_anybadge.task import URL
 
 
@@ -65,12 +68,13 @@ class TestTask(unittest.TestCase):
         create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_pylint_badge')
     @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_vulnerabilities_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeSeverity(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
+    def test__anybadge_Should_CallExpected_When_ExcludeSeverity(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, create_pylint_badge_patch, get_images_directory_patch, *patches):
         get_images_directory_patch.return_value = '/project/docs/images'
         get_badge_exclude_patch.return_value = ['vulnerabilities']
         project_mock = Mock()
@@ -82,14 +86,16 @@ class TestTask(unittest.TestCase):
         create_vulnerabilities_badge_patch.assert_not_called()
         create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, use_shields=False)
         create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
+        create_pylint_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/pylint', f'{get_images_directory_patch.return_value}/pylint.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_pylint_badge')
     @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_vulnerabilities_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeCoverage(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
+    def test__anybadge_Should_CallExpected_When_ExcludeCoverage(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, create_pylint_badge_patch, get_images_directory_patch, *patches):
         get_images_directory_patch.return_value = '/project/docs/images'
         get_badge_exclude_patch.return_value = ['coverage']
         project_mock = Mock()
@@ -101,14 +107,16 @@ class TestTask(unittest.TestCase):
         create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, use_shields=False)
         create_coverage_badge_patch.assert_not_called()
         create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
+        create_pylint_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/pylint', f'{get_images_directory_patch.return_value}/pylint.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_pylint_badge')
     @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_vulnerabilities_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludePython(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, get_images_directory_patch, *patches):
+    def test__anybadge_Should_CallExpected_When_ExcludePython(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, create_pylint_badge_patch, get_images_directory_patch, *patches):
         get_images_directory_patch.return_value = '/project/docs/images'
         get_badge_exclude_patch.return_value = ['python']
         project_mock = Mock()
@@ -120,15 +128,38 @@ class TestTask(unittest.TestCase):
         create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, use_shields=False)
         create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, use_shields=False)
         create_python_badge_patch.assert_not_called()
+        create_pylint_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/pylint', f'{get_images_directory_patch.return_value}/pylint.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_pylint_badge')
     @patch('pybuilder_anybadge.task.create_python_badge')
     @patch('pybuilder_anybadge.task.create_coverage_badge')
     @patch('pybuilder_anybadge.task.create_vulnerabilities_badge')
     @patch('pybuilder_anybadge.task.create_complexity_badge')
     @patch('pybuilder_anybadge.task.get_badge_exclude')
-    def test__anybadge_Should_CallExpected_When_ExcludeAll(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, *patches):
-        get_badge_exclude_patch.return_value = ['coverage', 'vulnerabilities', 'complexity', 'python']
+    def test__anybadge_Should_CallExpected_When_ExcludePylint(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, create_pylint_badge_patch, get_images_directory_patch, *patches):
+        get_images_directory_patch.return_value = '/project/docs/images'
+        get_badge_exclude_patch.return_value = ['pylint']
+        project_mock = Mock()
+        project_mock.get_property.side_effect = [False, False]
+        project_mock.expand_path.return_value = '/project/dir/reports'
+        logger_mock = Mock()
+        anybadge(project_mock, logger_mock, Mock())
+        create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, use_shields=False)
+        create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, use_shields=False)
+        create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, use_shields=False)
+        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
+        create_pylint_badge_patch.assert_not_called()
+
+    @patch('pybuilder_anybadge.task.get_images_directory')
+    @patch('pybuilder_anybadge.task.create_pylint_badge')
+    @patch('pybuilder_anybadge.task.create_python_badge')
+    @patch('pybuilder_anybadge.task.create_coverage_badge')
+    @patch('pybuilder_anybadge.task.create_vulnerabilities_badge')
+    @patch('pybuilder_anybadge.task.create_complexity_badge')
+    @patch('pybuilder_anybadge.task.get_badge_exclude')
+    def test__anybadge_Should_CallExpected_When_ExcludeAll(self, get_badge_exclude_patch, create_complexity_badge_patch, create_vulnerabilities_badge_patch, create_coverage_badge_patch, create_python_badge_patch, create_pylint_badge_patch, *patches):
+        get_badge_exclude_patch.return_value = ['coverage', 'vulnerabilities', 'complexity', 'python', 'pylint']
         project_mock = Mock()
         logger_mock = Mock()
         anybadge(project_mock, logger_mock, Mock())
@@ -136,6 +167,7 @@ class TestTask(unittest.TestCase):
         create_vulnerabilities_badge_patch.assert_not_called()
         create_coverage_badge_patch.assert_not_called()
         create_python_badge_patch.assert_not_called()
+        create_pylint_badge_patch.assert_not_called()
 
     @patch('pybuilder_anybadge.task.os.path.exists', return_value=False)
     @patch('pybuilder_anybadge.task.os.makedirs')
@@ -610,3 +642,67 @@ class TestTask(unittest.TestCase):
         create_python_badge('--badge--', logger_mock, use_shields=True)
         update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
         get_line_to_add_patch.assert_called_once_with('python', get_python_badge_patch.return_value, True)
+
+    def test__get_pylint_report_Should_ReturnExpected_When_Match(self, *patches):
+        report_lines = 'Your code has been rated at 10.00/10 (previous run: 9.98/10, +0.02)\n'
+        result = get_pylint_report(report_lines)
+        expected_result = '10.00'
+        self.assertEqual(result, expected_result)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=False)
+    def test__create_pylint_badge_Should_CallExpected_When_NotAccessible(self, *patches):
+        logger_mock = Mock()
+        create_pylint_badge('--report-filename--', '--badge-filename--', logger_mock)
+        logger_mock.warn.assert_called()
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.read_file')
+    @patch('pybuilder_anybadge.task.get_pylint_report')
+    @patch('pybuilder_anybadge.task.get_pylint_badge')
+    @patch('pybuilder_anybadge.task.get_line_to_add')
+    @patch('pybuilder_anybadge.task.update_readme')
+    def test__create_pylint_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, get_line_to_add_patch, *patches):
+        logger_mock = Mock()
+        create_pylint_badge('--report-filename--', '--badge-filename--', logger_mock)
+        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.read_file')
+    @patch('pybuilder_anybadge.task.get_pylint_report')
+    @patch('pybuilder_anybadge.task.get_pylint_badge')
+    @patch('pybuilder_anybadge.task.get_line_to_add')
+    @patch('pybuilder_anybadge.task.update_readme')
+    def test__create_pylint_badge_Should_CallExpected_When_UseShields(self, update_readme_patch, get_line_to_add_patch, *patches):
+        logger_mock = Mock()
+        create_pylint_badge('--report-filename--', '--badge-filename--', logger_mock, use_shields=True)
+        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+
+    @patch('pybuilder_anybadge.task.Badge')
+    def test__get_pylint_badge_Should_ReturnExpected_When_Green(self, badge_patch, *patches):
+        result = get_pylint_badge(10.00)
+        self.assertEqual(result, badge_patch.return_value)
+        badge_patch.assert_called_once_with('pylint', value=10.0, default_color='green')
+
+    @patch('pybuilder_anybadge.task.Badge')
+    def test__get_pylint_badge_Should_ReturnExpected_When_Yellow(self, badge_patch, *patches):
+        result = get_pylint_badge(8.42)
+        self.assertEqual(result, badge_patch.return_value)
+        badge_patch.assert_called_once_with('pylint', value=8.42, default_color='yellow')
+
+    @patch('pybuilder_anybadge.task.Badge')
+    def test__get_pylint_badge_Should_ReturnExpected_When_Orange(self, badge_patch, *patches):
+        result = get_pylint_badge(6.66)
+        self.assertEqual(result, badge_patch.return_value)
+        badge_patch.assert_called_once_with('pylint', value=6.66, default_color='orange')
+
+    @patch('pybuilder_anybadge.task.Badge')
+    def test__get_pylint_badge_Should_ReturnExpected_When_Red(self, badge_patch, *patches):
+        result = get_pylint_badge(4.28)
+        self.assertEqual(result, badge_patch.return_value)
+        badge_patch.assert_called_once_with('pylint', value=4.28, default_color='red')
+
+    @patch('pybuilder_anybadge.task.Badge')
+    def test__get_pylint_badge_Should_ReturnExpected_When_UseShields(self, badge_patch, *patches):
+        result = get_pylint_badge(4.28, use_shields=True)
+        expected_result = 'https://img.shields.io/badge/pylint-4.28-red'
+        self.assertEqual(result, expected_result)
