@@ -8,6 +8,7 @@ from pybuilder.core import Author
 
 use_plugin('python.core')
 use_plugin('python.unittest')
+use_plugin('python.install_dependencies')
 use_plugin('python.flake8')
 use_plugin('python.coverage')
 use_plugin('python.distutils')
@@ -19,8 +20,13 @@ name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A pybuilder plugin that generates badges for your project'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.2.7'
-default_task = ['clean', 'radon', 'bandit', 'publish']
+version = '0.3.0'
+default_task = [
+    'clean',
+    'radon',
+    'bandit',
+    'publish'
+]
 license = 'Apache License, Version 2.0'
 description = summary
 
@@ -49,7 +55,7 @@ def set_properties(project):
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Software Development :: Build Tools'])
     # only for functional testing plugin
     # project.set_property('anybadge_exclude', 'vulnerabilities, coverage')
