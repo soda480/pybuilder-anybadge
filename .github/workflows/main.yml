@@ -9,14 +9,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-16.04
-    container: python:3.6-slim
+    runs-on: ubuntu-20.04
+    container: python:3.9-slim
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Install pybuilder
       run: pip install pybuilder
+
+    - name: Install dependencies
+      run: pyb install_dependencies
 
     - name: Execute build
       run: pyb
@@ -32,4 +35,3 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: coverage.xml
-

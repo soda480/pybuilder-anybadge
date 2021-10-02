@@ -1,9 +1,9 @@
+# pybuilder-anybadge #
 [![GitHub Workflow Status](https://github.com/soda480/pybuilder-anybadge/workflows/build/badge.svg)](https://github.com/soda480/pybuilder-anybadge/actions)
 [![Code Coverage](https://codecov.io/gh/soda480/pybuilder-anybadge/branch/main/graph/badge.svg)](https://codecov.io/gh/soda480/pybuilder-anybadge)
 [![Code Grade](https://www.code-inspector.com/project/20103/status/svg)](https://frontend.code-inspector.com/project/20103/dashboard)
 [![PyPI version](https://badge.fury.io/py/pybuilder-anybadge.svg)](https://badge.fury.io/py/pybuilder-anybadge)
-
-# pybuilder-anybadge #
+[![python](https://img.shields.io/badge/python-3.9-teal)](https://www.python.org/downloads/)
 
 A pybuilder plugin that generates badges for your project. The plugin by default will create badges using `anybadge`, for more information refer to the [anybadge pypi page](https://pypi.org/project/anybadge/). The plugin can also be configured to generate the badges using `img.shields.io`.
 
@@ -73,9 +73,9 @@ Run the Docker container:
 docker container run \
 --rm \
 -it \
--v $PWD:/pybuilder-anybadge \
+-v $PWD:/code \
 pybanybadge:latest \
-/bin/sh
+/bin/bash
 ```
 
 Execute the build:
