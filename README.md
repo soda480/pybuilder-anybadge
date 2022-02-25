@@ -1,7 +1,7 @@
 # pybuilder-anybadge #
 [![GitHub Workflow Status](https://github.com/soda480/pybuilder-anybadge/workflows/build/badge.svg)](https://github.com/soda480/pybuilder-anybadge/actions)
 [![Code Coverage](https://codecov.io/gh/soda480/pybuilder-anybadge/branch/main/graph/badge.svg)](https://codecov.io/gh/soda480/pybuilder-anybadge)
-[![Code Grade](https://www.code-inspector.com/project/20103/status/svg)](https://frontend.code-inspector.com/project/20103/dashboard)
+[![Code Grade](https://api.codiga.io/project/20103/status/svg)](https://app.codiga.io/public/project/20103/pybuilder-anybadge/dashboard)
 [![PyPI version](https://badge.fury.io/py/pybuilder-anybadge.svg)](https://badge.fury.io/py/pybuilder-anybadge)
 [![python](https://img.shields.io/badge/python-3.9-teal)](https://www.python.org/downloads/)
 
