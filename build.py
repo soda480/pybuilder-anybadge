@@ -19,12 +19,13 @@ name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A pybuilder plugin that generates badges for your project'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.3.0'
+version = '0.3.1'
 default_task = [
     'clean',
+    'analyze',
+    'publish',
     'radon',
-    'bandit',
-    'publish'
+    'bandit'
 ]
 license = 'Apache License, Version 2.0'
 description = summary
@@ -40,7 +41,7 @@ def set_properties(project):
     project.set_property('flake8_include_scripts', True)
     project.set_property('flake8_include_test_sources', True)
     project.set_property('flake8_ignore', 'F401, E501, E722')
-    project.build_depends_on_requirements('requirements-build.txt')
+    project.build_depends_on('mock')
     project.depends_on_requirements('requirements.txt')
     project.set_property('distutils_readme_description', True)
     project.set_property('distutils_description_overwrite', True)
@@ -54,10 +55,10 @@ def set_properties(project):
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Software Development :: Build Tools'])
     # only for functional testing plugin
     # project.set_property('anybadge_exclude', 'vulnerabilities, coverage')

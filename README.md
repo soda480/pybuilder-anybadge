@@ -1,4 +1,4 @@
-# pybuilder-anybadge #
+# pybuilder-anybadge
 [![GitHub Workflow Status](https://github.com/soda480/pybuilder-anybadge/workflows/build/badge.svg)](https://github.com/soda480/pybuilder-anybadge/actions)
 [![Code Coverage](https://codecov.io/gh/soda480/pybuilder-anybadge/branch/main/graph/badge.svg)](https://codecov.io/gh/soda480/pybuilder-anybadge)
 [![Code Grade](https://api.codiga.io/project/20103/status/svg)](https://app.codiga.io/public/project/20103/pybuilder-anybadge/dashboard)
@@ -17,7 +17,7 @@ use_plugin('pypi:pybuilder_anybadge')
 use_plugin('pypi:pybuilder_anybadge', '~=0.1.6')
 ```
 
-### Pybuilder anybadge properties ###
+### Pybuilder anybadge properties
 
 The pybuilder task `pyb anybadge` will use anybadge to generate badges for your project by processing reports produced from various plugins; the badges that are currently supported are:
 - **complexity** - requires the [pybuilder_radon](https://pypi.org/project/pybuilder-radon/) plugin. Generate badge using cyclomatic complexity score of your most complicated function.
@@ -57,7 +57,7 @@ However, setting `anybadge_use_shields` to `True` will render the badges using `
 [![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-brightgreen)](https://pypi.org/project/bandit/)
 [![python](https://img.shields.io/badge/python-3.6-teal)](https://www.python.org/downloads/)
 
-### Development ###
+### Development
 
 Clone the repository and ensure the latest version of Docker is installed on your development server.
 
@@ -75,7 +75,7 @@ docker container run \
 -it \
 -v $PWD:/code \
 pybanybadge:latest \
-/bin/bash
+bash
 ```
 
 Execute the build:

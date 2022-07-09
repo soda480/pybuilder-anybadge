@@ -1,5 +1,7 @@
 name: build
 on:
+  schedule:
+  - cron: "0 8 * * *"
   push:
     branches:
       - '**'
@@ -9,25 +11,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
-    container: python:3.9-slim
-
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install pybuilder
-      run: pip install pybuilder
-
-    - name: Execute build
-      run: pyb
-
-    - name: Install Codecov requirements
+    - name: Build Docker image
       run: |
-        apt-get update
-        apt-get install -y bash curl
-        sed -e 's,filename="pybuilder-anybadge/,filename="src/main/python/pybuilder_anybadge/,g' target/reports/pybuilder-anybadge_coverage.xml > coverage.xml
+        docker image build -t pybanybadge:latest .
+
+    - name: Prepare coverage
+      run: |
+        ID=$(docker create pybanybadge)
+        docker cp $ID:/code/target/reports/pybuilder-anybadge_coverage.xml pybanybadge_coverage.xml
+        sed -i -e 's,filename="pybanybadge/,filename="src/main/python/pybanybadge/,g' pybanybadge_coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: coverage.xml
+        file: pybanybadge_coverage.xml
