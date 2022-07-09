@@ -9,23 +9,33 @@ on:
     branches:
       - main
 jobs:
-  build:
+  build-images:
+    strategy:
+      matrix:
+        version: ['3.7', '3.8', '3.9', '3.10']
+    name: Build Python Docker images
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Build Docker image
-      run: |
-        docker image build -t pybanybadge:latest .
-
-    - name: Prepare coverage
-      run: |
-        ID=$(docker create pybanybadge)
-        docker cp $ID:/code/target/reports/pybuilder-anybadge_coverage.xml pybanybadge_coverage.xml
-        sed -i -e 's,filename="pybanybadge/,filename="src/main/python/pybanybadge/,g' pybanybadge_coverage.xml
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: pybanybadge_coverage.xml
+      - uses: actions/checkout@v3
+      - name: build images
+        run:
+          docker image build --build-arg PYTHON_VERSION=${{ matrix.version }} -t pybanybadge:${{ matrix.version }} .
+  coverage:
+    name: Publish Code Coverage Report
+    needs: build-images
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: build image
+        run:
+          docker image build -t pybanybadge:latest .
+      - name: prepare report
+        run: |
+          ID=$(docker create pybanybadge)
+          docker cp $ID:/code/target/reports/pybuilder-anybadge_coverage.xml pybanybadge_coverage.xml
+          sed -i -e 's,filename="pybanybadge/,filename="src/main/python/pybanybadge/,g' pybanybadge_coverage.xml
+      - name: upload report
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: pybanybadge_coverage.xml
