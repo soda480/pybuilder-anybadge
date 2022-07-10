@@ -267,7 +267,7 @@ def get_python_badge(project, use_shields=False):
     return badge
 
 
-def update_readme(line_to_add, logger):
+def update_readme(badge_name, line_to_add, logger):
     """ add badge to readme
     """
     filename = 'README.md'
@@ -277,14 +277,19 @@ def update_readme(line_to_add, logger):
 
     with open('README.md', 'r+') as file_handler:
         lines = file_handler.readlines()
-        for line in lines:
-            if line.startswith(line_to_add):
-                logger.debug(f'{filename} already contains {line_to_add.strip()}')
+        for index, line in enumerate(lines):
+            if line.startswith(f'[![{badge_name}]'):
+                if line.strip() == line_to_add.strip():
+                    logger.debug(f'{filename} already contains {line_to_add.strip()}')
+                    return
+                lines[index] = line_to_add
+                logger.debug(f'updating badge {badge_name} with {line_to_add.strip()}')
                 break
         else:
-            file_handler.seek(0)
+            logger.debug(f'adding badge {badge_name} {line_to_add.strip()} to top of {filename}')
             lines.insert(0, line_to_add)
-            file_handler.writelines(lines)
+        file_handler.seek(0)
+        file_handler.writelines(lines)
 
 
 def get_line_to_add(name, badge, badge_is_url):
@@ -310,7 +315,7 @@ def create_complexity_badge(report_path, badge_path, logger, use_average, use_sh
         else:
             badge.write_badge(badge_path, overwrite=True)
             line_to_add = get_line_to_add('complexity', badge_path, use_shields)
-        update_readme(line_to_add, logger)
+        update_readme('complexity', line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
@@ -326,7 +331,7 @@ def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=Fa
         else:
             badge.write_badge(badge_path, overwrite=True)
             line_to_add = get_line_to_add('vulnerabilities', badge_path, use_shields)
-        update_readme(line_to_add, logger)
+        update_readme('vulnerabilities', line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
@@ -342,7 +347,7 @@ def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
         else:
             badge.write_badge(badge_path, overwrite=True)
             line_to_add = get_line_to_add('coverage', badge_path, use_shields)
-        update_readme(line_to_add, logger)
+        update_readme('coverage', line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
@@ -356,4 +361,4 @@ def create_python_badge(project, badge_path, logger, use_shields=False):
     else:
         badge.write_badge(badge_path, overwrite=True)
         line_to_add = get_line_to_add('python', badge_path, use_shields)
-    update_readme(line_to_add, logger)
+    update_readme('python', line_to_add, logger)

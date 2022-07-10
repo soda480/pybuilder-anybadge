@@ -461,7 +461,7 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__update_readme_Should_CallExpected_When_NotAccessible(self, *patches):
         logger_mock = Mock()
-        update_readme('--line-to-add--', logger_mock)
+        update_readme('--badge-name--', '--line-to-add--', logger_mock)
         logger_mock.warn.assert_called()
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
@@ -471,16 +471,27 @@ class TestTask(unittest.TestCase):
             mock_open(read_data='line1\nline2\nline3').return_value
         ]
         logger_mock = Mock()
-        update_readme('line4', logger_mock)
+        update_readme('--badge-name--', 'line4', logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
     @patch('pybuilder_anybadge.task.open', create=True)
-    def test__update_readme_Should_CallExpected_When_Match(self, open_patch, *patches):
+    def test__update_readme_Should_Return_When_BadgeIsSame(self, open_patch, *patches):
         open_patch.side_effect = [
-            mock_open(read_data='line1\nline2\nline3').return_value
+            mock_open(read_data='line1\n[![complexity](abc def)](jkl)\nline3').return_value
         ]
         logger_mock = Mock()
-        update_readme('line2', logger_mock)
+        update_readme('complexity', '[![complexity](abc def)](jkl)', logger_mock)
+        # XX figure out how to mock call to writelines
+
+    @patch('pybuilder_anybadge.task.accessible', return_value=True)
+    @patch('pybuilder_anybadge.task.open', create=True)
+    def test__update_readme_Should_Return_When_BadgeIsNotSame(self, open_patch, *patches):
+        open_patch.side_effect = [
+            mock_open(read_data='line1\n[![complexity](abc)](def)\nline3').return_value
+        ]
+        logger_mock = Mock()
+        update_readme('complexity', '[![complexity](abc def ghi)](jkl mno)', logger_mock)
+        # XX figure out how to mock call to writelines
 
     def test__get_line_to_add_Should_ReturnExpected_When_BadgeIsUrl(self, *patches):
         name = 'vulnerabilities'
@@ -516,7 +527,7 @@ class TestTask(unittest.TestCase):
     def test__create_complexity_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('complexity', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
     @patch('pybuilder_anybadge.task.read_lines')
@@ -527,7 +538,7 @@ class TestTask(unittest.TestCase):
     def test__create_complexity_badge_Should_CallExpected_When_UseShields(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_complexity_badge('--report-filename--', '--badge-filename--', logger_mock, True, use_shields=True)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('complexity', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_vulnerabilities_badge_Should_CallExpected_When_NotAccessible(self, *patches):
@@ -543,7 +554,7 @@ class TestTask(unittest.TestCase):
     def test__create_vulnerabilities_badge_Should_CallExpected_When_Accessible(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_vulnerabilities_badge('--report-filename--', '--badge-filename--', logger_mock)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('vulnerabilities', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
     @patch('pybuilder_anybadge.task.read_data')
@@ -553,7 +564,7 @@ class TestTask(unittest.TestCase):
     def test__create_vulnerabilities_badge_Should_CallExpected_When_UseShields(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_vulnerabilities_badge('--report-filename--', '--badge-filename--', logger_mock, use_shields=True)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('vulnerabilities', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=False)
     def test__create_coverage_badge_Should_CallExpected_When_NotAccessible(self, *patches):
@@ -570,7 +581,7 @@ class TestTask(unittest.TestCase):
     def test__create_coverage_badge_Should_CallExpected_When_AccessibleCoverage(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('coverage', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.accessible', return_value=True)
     @patch('pybuilder_anybadge.task.read_data')
@@ -581,7 +592,7 @@ class TestTask(unittest.TestCase):
     def test__create_coverage_badge_Should_CallExpected_When_UseShields(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_coverage_badge('--report-filename--', '--badge-filename--', logger_mock, use_shields=True)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('coverage', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.get_python_badge')
     @patch('pybuilder_anybadge.task.get_line_to_add')
@@ -589,7 +600,7 @@ class TestTask(unittest.TestCase):
     def test__create_python_badge_Should_CallExpexted_When_Called(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
         create_python_badge(Mock(), '--badge-filename--', logger_mock)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('python', get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.get_python_badge')
     @patch('pybuilder_anybadge.task.get_line_to_add')
@@ -597,7 +608,7 @@ class TestTask(unittest.TestCase):
     def test__create_python_badge_Should_CallExpexted_When_UseShields(self, update_readme_patch, get_line_to_add_patch, get_python_badge_patch, *patches):
         logger_mock = Mock()
         create_python_badge(Mock(), '--badge--', logger_mock, use_shields=True)
-        update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
+        update_readme_patch.assert_called_once_with('python', get_line_to_add_patch.return_value, logger_mock)
         get_line_to_add_patch.assert_called_once_with('python', get_python_badge_patch.return_value, True)
 
     def test__get_python_version_Should_ReturnExpected_When_DistutilsClassifiersContainsPythonVersions(self, *patches):
