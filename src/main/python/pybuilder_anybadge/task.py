@@ -24,7 +24,7 @@ def init_anybadge(project):
     project.plugin_depends_on('anybadge')
     project.set_property_if_unset('anybadge_exclude', [])
     project.set_property_if_unset('anybadge_complexity_use_average', False)
-    project.set_property_if_unset('anybadge_use_shields', False)
+    project.set_property_if_unset('anybadge_use_shields', True)
 
 
 @task('anybadge', description='generate badges from reports using anybadge')
@@ -288,6 +288,8 @@ def update_readme(badge_name, line_to_add, logger):
         else:
             logger.debug(f'adding badge {badge_name} {line_to_add.strip()} to top of {filename}')
             lines.insert(0, line_to_add)
+        # write lines to readme
+        file_handler.truncate(0)
         file_handler.seek(0)
         file_handler.writelines(lines)
 
@@ -304,7 +306,7 @@ def get_line_to_add(name, badge, badge_is_url):
     return line_to_add
 
 
-def create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=False):
+def create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=True):
     """ create complexity badge from radon report
     """
     if accessible(report_path):
@@ -320,7 +322,7 @@ def create_complexity_badge(report_path, badge_path, logger, use_average, use_sh
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=False):
+def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=True):
     """ create vulnerabilities badge from bandit report
     """
     if accessible(report_path):
@@ -336,7 +338,7 @@ def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=Fa
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
+def create_coverage_badge(report_path, badge_path, logger, use_shields=True):
     """ create coverage badge from coverage report
     """
     if accessible(report_path):
@@ -352,7 +354,7 @@ def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_python_badge(project, badge_path, logger, use_shields=False):
+def create_python_badge(project, badge_path, logger, use_shields=True):
     """ create python version badge
     """
     badge = get_python_badge(project, use_shields=use_shields)
