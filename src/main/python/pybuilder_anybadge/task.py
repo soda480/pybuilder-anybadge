@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import json
+import urllib.parse
 from pybuilder.core import init
 from pybuilder.core import task
 from pybuilder.core import depends
@@ -38,7 +39,7 @@ def anybadge(project, logger, reactor):
     logger.debug(f'task instructed to exclude {exclude}')
     if 'python' not in exclude:
         badge_path = os.path.join(images_directory, 'python.svg')
-        create_python_badge(badge_path, logger, use_shields=use_shields)
+        create_python_badge(project, badge_path, logger, use_shields=use_shields)
     if 'vulnerabilities' not in exclude:
         report_path = os.path.join(reports_directory, 'bandit.json')
         badge_path = os.path.join(images_directory, 'vulnerabilities.svg')
@@ -232,12 +233,34 @@ def get_coverage_badge(coverage, use_shields=False):
     return badge
 
 
-def get_python_badge(use_shields=False):
+def get_python_version(project):
+    """ return versions of Python being used
+        query distutils_classifiers for Python version first if none found then
+        return current version being used
+    """
+    version = None
+    distutils_classifiers = project.get_property('distutils_classifiers')
+    if distutils_classifiers:
+        regex = r'^Programming Language :: Python :: (?P<version>[\d.]*\d+)$'
+        versions = []
+        for classifier in distutils_classifiers:
+            match = re.match(regex, classifier)
+            if match:
+                versions.append(match.group('version'))
+        if versions:
+            version = ' | '.join(versions)
+    if not version:
+        version = f'{sys.version_info.major}.{sys.version_info.minor}'
+    return version
+
+
+def get_python_badge(project, use_shields=False):
     """ return badge for python version
     """
-    value = f'{sys.version_info.major}.{sys.version_info.minor}'
+    value = get_python_version(project)
     color = 'teal'
     if use_shields:
+        value = urllib.parse.quote(value)
         badge = f'https://img.shields.io/badge/python-{value}-{color}'
     else:
         badge = Badge('python', value=value, default_color=color)
@@ -324,10 +347,10 @@ def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_python_badge(badge_path, logger, use_shields=False):
+def create_python_badge(project, badge_path, logger, use_shields=False):
     """ create python version badge
     """
-    badge = get_python_badge(use_shields=use_shields)
+    badge = get_python_badge(project, use_shields=use_shields)
     if use_shields:
         line_to_add = get_line_to_add('python', badge, use_shields)
     else:

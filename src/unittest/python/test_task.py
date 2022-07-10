@@ -24,20 +24,11 @@ from pybuilder_anybadge.task import create_complexity_badge
 from pybuilder_anybadge.task import create_vulnerabilities_badge
 from pybuilder_anybadge.task import create_coverage_badge
 from pybuilder_anybadge.task import create_python_badge
+from pybuilder_anybadge.task import get_python_version
 from pybuilder_anybadge.task import URL
 
 
 class TestTask(unittest.TestCase):
-
-    def setUp(self):
-        """
-        """
-        pass
-
-    def tearDown(self):
-        """
-        """
-        pass
 
     def test__init_anybadge_Should_CallExpected_When_Called(self, *patches):
         project_mock = Mock()
@@ -62,7 +53,7 @@ class TestTask(unittest.TestCase):
         create_complexity_badge_patch.assert_not_called()
         create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, use_shields=False)
         create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, use_shields=False)
-        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
+        create_python_badge_patch.assert_called_once_with(project_mock, f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -81,7 +72,7 @@ class TestTask(unittest.TestCase):
         create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, True, use_shields=False)
         create_vulnerabilities_badge_patch.assert_not_called()
         create_coverage_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/{project_mock.name}_coverage.json', f'{get_images_directory_patch.return_value}/coverage.svg', logger_mock, use_shields=False)
-        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
+        create_python_badge_patch.assert_called_once_with(project_mock, f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -100,7 +91,7 @@ class TestTask(unittest.TestCase):
         create_complexity_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/radon', f'{get_images_directory_patch.return_value}/complexity.svg', logger_mock, False, use_shields=False)
         create_vulnerabilities_badge_patch.assert_called_once_with(f'{project_mock.expand_path.return_value}/bandit.json', f'{get_images_directory_patch.return_value}/vulnerabilities.svg', logger_mock, use_shields=False)
         create_coverage_badge_patch.assert_not_called()
-        create_python_badge_patch.assert_called_once_with(f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
+        create_python_badge_patch.assert_called_once_with(project_mock, f'{get_images_directory_patch.return_value}/python.svg', logger_mock, use_shields=False)
 
     @patch('pybuilder_anybadge.task.get_images_directory')
     @patch('pybuilder_anybadge.task.create_python_badge')
@@ -451,21 +442,19 @@ class TestTask(unittest.TestCase):
         expected_result = 'https://img.shields.io/badge/coverage-54%25-red'
         self.assertEqual(result, expected_result)
 
-    @patch('pybuilder_anybadge.task.sys')
+    @patch('pybuilder_anybadge.task.get_python_version', return_value='--major--.--minor--')
     @patch('pybuilder_anybadge.task.Badge')
-    def test__get_python_badge_Should_ReturnExpected_When_Called(self, badge_patch, sys_patch, *patches):
-        sys_patch.version_info.major = '--major--'
-        sys_patch.version_info.minor = '--minor--'
-        result = get_python_badge()
+    def test__get_python_badge_Should_ReturnExpected_When_Called(self, badge_patch, *patches):
+        project_mock = Mock()
+        result = get_python_badge(project_mock)
         self.assertEqual(result, badge_patch.return_value)
         badge_patch.assert_called_once_with('python', value='--major--.--minor--', default_color='teal')
 
-    @patch('pybuilder_anybadge.task.sys')
+    @patch('pybuilder_anybadge.task.get_python_version', return_value='3.6')
     @patch('pybuilder_anybadge.task.Badge')
-    def test__get_python_badge_Should_ReturnExpected_When_UseShields(self, badge_patch, sys_patch, *patches):
-        sys_patch.version_info.major = '3'
-        sys_patch.version_info.minor = '6'
-        result = get_python_badge(use_shields=True)
+    def test__get_python_badge_Should_ReturnExpected_When_UseShields(self, badge_patch, *patches):
+        project_mock = Mock()
+        result = get_python_badge(project_mock, use_shields=True)
         expected_result = 'https://img.shields.io/badge/python-3.6-teal'
         self.assertEqual(result, expected_result)
 
@@ -599,7 +588,7 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_python_badge_Should_CallExpexted_When_Called(self, update_readme_patch, get_line_to_add_patch, *patches):
         logger_mock = Mock()
-        create_python_badge('--badge-filename--', logger_mock)
+        create_python_badge(Mock(), '--badge-filename--', logger_mock)
         update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
 
     @patch('pybuilder_anybadge.task.get_python_badge')
@@ -607,6 +596,51 @@ class TestTask(unittest.TestCase):
     @patch('pybuilder_anybadge.task.update_readme')
     def test__create_python_badge_Should_CallExpexted_When_UseShields(self, update_readme_patch, get_line_to_add_patch, get_python_badge_patch, *patches):
         logger_mock = Mock()
-        create_python_badge('--badge--', logger_mock, use_shields=True)
+        create_python_badge(Mock(), '--badge--', logger_mock, use_shields=True)
         update_readme_patch.assert_called_once_with(get_line_to_add_patch.return_value, logger_mock)
         get_line_to_add_patch.assert_called_once_with('python', get_python_badge_patch.return_value, True)
+
+    def test__get_python_version_Should_ReturnExpected_When_DistutilsClassifiersContainsPythonVersions(self, *patches):
+        project_mock = Mock()
+        project_mock.get_property.return_value = [
+            'Development Status :: 4 - Beta',
+            'Environment :: Other Environment',
+            'Environment :: Plugins',
+            'Intended Audience :: Developers',
+            'Intended Audience :: System Administrators',
+            'License :: OSI Approved :: Apache Software License',
+            'Operating System :: POSIX :: Linux',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
+            'Topic :: Software Development :: Build Tools'
+        ]
+        result = get_python_version(project_mock)
+        expected_result = '3.7 | 3.8 | 3.9 | 3.10'
+        self.assertEqual(result, expected_result)
+
+    @patch('pybuilder_anybadge.task.sys')
+    def test__get_python_version_Should_ReturnExpected_When_DistutilsClassifiersDoesNotContainPythonVersions(self, sys_patch, *patches):
+        project_mock = Mock()
+        project_mock.get_property.return_value = [
+            'Development Status :: 4 - Beta',
+            'Environment :: Other Environment',
+            'Environment :: Plugins',
+            'Intended Audience :: Developers',
+            'Intended Audience :: System Administrators',
+            'License :: OSI Approved :: Apache Software License',
+            'Operating System :: POSIX :: Linux',
+            'Programming Language :: Python',
+            'Topic :: Software Development :: Build Tools'
+        ]
+        result = get_python_version(project_mock)
+        self.assertEqual(result, f'{sys_patch.version_info.major}.{sys_patch.version_info.minor}')
+
+    @patch('pybuilder_anybadge.task.sys')
+    def test__get_python_version_Should_ReturnExpected_When_NoDistutilsClassifiers(self, sys_patch, *patches):
+        project_mock = Mock()
+        project_mock.get_property.return_value = None
+        result = get_python_version(project_mock)
+        self.assertEqual(result, f'{sys_patch.version_info.major}.{sys_patch.version_info.minor}')
