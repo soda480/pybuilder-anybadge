@@ -20,18 +20,33 @@ jobs:
       - name: build images
         run:
           docker image build --build-arg PYTHON_VERSION=${{ matrix.version }} -t pybanybadge:${{ matrix.version }} .
+      - name: save pybanybadge ${{ matrix.version }} image
+        if: ${{ matrix.version == '3.9' }}
+        run: |
+          mkdir -p images
+          docker save --output images/pybanybadge-${{ matrix.version }}.tar pybanybadge:${{ matrix.version }}
+      - name: upload pybanybadge ${{ matrix.version }} image artifact
+        if: ${{ matrix.version == '3.9' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: image
+          path: images/pybanybadge-${{ matrix.version }}.tar
   coverage:
     name: Publish Code Coverage Report
     needs: build-images
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-      - name: build image
+      - name: download image artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: image
+          path: images/
+      - name: load image
         run:
-          docker image build -t pybanybadge:latest .
+          docker load --input images/pybanybadge-3.9.tar
       - name: prepare report
         run: |
-          ID=$(docker create pybanybadge)
+          ID=$(docker create pybanybadge:3.9)
           docker cp $ID:/code/target/reports/pybuilder-anybadge_coverage.xml pybanybadge_coverage.xml
           sed -i -e 's,filename="pybanybadge/,filename="src/main/python/pybanybadge/,g' pybanybadge_coverage.xml
       - name: upload report
