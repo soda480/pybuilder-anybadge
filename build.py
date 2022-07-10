@@ -19,7 +19,7 @@ name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A pybuilder plugin that generates badges for your project'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.3.1'
+version = '0.3.2'
 default_task = [
     'clean',
     'analyze',
