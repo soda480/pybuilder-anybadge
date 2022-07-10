@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import json
+import urllib.parse
 from pybuilder.core import init
 from pybuilder.core import task
 from pybuilder.core import depends
@@ -23,7 +24,7 @@ def init_anybadge(project):
     project.plugin_depends_on('anybadge')
     project.set_property_if_unset('anybadge_exclude', [])
     project.set_property_if_unset('anybadge_complexity_use_average', False)
-    project.set_property_if_unset('anybadge_use_shields', False)
+    project.set_property_if_unset('anybadge_use_shields', True)
 
 
 @task('anybadge', description='generate badges from reports using anybadge')
@@ -38,7 +39,7 @@ def anybadge(project, logger, reactor):
     logger.debug(f'task instructed to exclude {exclude}')
     if 'python' not in exclude:
         badge_path = os.path.join(images_directory, 'python.svg')
-        create_python_badge(badge_path, logger, use_shields=use_shields)
+        create_python_badge(project, badge_path, logger, use_shields=use_shields)
     if 'vulnerabilities' not in exclude:
         report_path = os.path.join(reports_directory, 'bandit.json')
         badge_path = os.path.join(images_directory, 'vulnerabilities.svg')
@@ -232,19 +233,41 @@ def get_coverage_badge(coverage, use_shields=False):
     return badge
 
 
-def get_python_badge(use_shields=False):
+def get_python_version(project):
+    """ return versions of Python being used
+        query distutils_classifiers for Python version first if none found then
+        return current version being used
+    """
+    version = None
+    distutils_classifiers = project.get_property('distutils_classifiers')
+    if distutils_classifiers:
+        regex = r'^Programming Language :: Python :: (?P<version>[\d.]*\d+)$'
+        versions = []
+        for classifier in distutils_classifiers:
+            match = re.match(regex, classifier)
+            if match:
+                versions.append(match.group('version'))
+        if versions:
+            version = ' | '.join(versions)
+    if not version:
+        version = f'{sys.version_info.major}.{sys.version_info.minor}'
+    return version
+
+
+def get_python_badge(project, use_shields=False):
     """ return badge for python version
     """
-    value = f'{sys.version_info.major}.{sys.version_info.minor}'
+    value = get_python_version(project)
     color = 'teal'
     if use_shields:
+        value = urllib.parse.quote(value)
         badge = f'https://img.shields.io/badge/python-{value}-{color}'
     else:
         badge = Badge('python', value=value, default_color=color)
     return badge
 
 
-def update_readme(line_to_add, logger):
+def update_readme(badge_name, line_to_add, logger):
     """ add badge to readme
     """
     filename = 'README.md'
@@ -254,14 +277,21 @@ def update_readme(line_to_add, logger):
 
     with open('README.md', 'r+') as file_handler:
         lines = file_handler.readlines()
-        for line in lines:
-            if line.startswith(line_to_add):
-                logger.debug(f'{filename} already contains {line_to_add.strip()}')
+        for index, line in enumerate(lines):
+            if line.startswith(f'[![{badge_name}]'):
+                if line.strip() == line_to_add.strip():
+                    logger.debug(f'{filename} already contains {line_to_add.strip()}')
+                    return
+                lines[index] = line_to_add
+                logger.debug(f'updating badge {badge_name} with {line_to_add.strip()}')
                 break
         else:
-            file_handler.seek(0)
+            logger.debug(f'adding badge {badge_name} {line_to_add.strip()} to top of {filename}')
             lines.insert(0, line_to_add)
-            file_handler.writelines(lines)
+        # write lines to readme
+        file_handler.truncate(0)
+        file_handler.seek(0)
+        file_handler.writelines(lines)
 
 
 def get_line_to_add(name, badge, badge_is_url):
@@ -276,7 +306,7 @@ def get_line_to_add(name, badge, badge_is_url):
     return line_to_add
 
 
-def create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=False):
+def create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=True):
     """ create complexity badge from radon report
     """
     if accessible(report_path):
@@ -287,12 +317,12 @@ def create_complexity_badge(report_path, badge_path, logger, use_average, use_sh
         else:
             badge.write_badge(badge_path, overwrite=True)
             line_to_add = get_line_to_add('complexity', badge_path, use_shields)
-        update_readme(line_to_add, logger)
+        update_readme('complexity', line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=False):
+def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=True):
     """ create vulnerabilities badge from bandit report
     """
     if accessible(report_path):
@@ -303,12 +333,12 @@ def create_vulnerabilities_badge(report_path, badge_path, logger, use_shields=Fa
         else:
             badge.write_badge(badge_path, overwrite=True)
             line_to_add = get_line_to_add('vulnerabilities', badge_path, use_shields)
-        update_readme(line_to_add, logger)
+        update_readme('vulnerabilities', line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
+def create_coverage_badge(report_path, badge_path, logger, use_shields=True):
     """ create coverage badge from coverage report
     """
     if accessible(report_path):
@@ -319,18 +349,18 @@ def create_coverage_badge(report_path, badge_path, logger, use_shields=False):
         else:
             badge.write_badge(badge_path, overwrite=True)
             line_to_add = get_line_to_add('coverage', badge_path, use_shields)
-        update_readme(line_to_add, logger)
+        update_readme('coverage', line_to_add, logger)
     else:
         logger.warn(f'{report_path} is not accessible')
 
 
-def create_python_badge(badge_path, logger, use_shields=False):
+def create_python_badge(project, badge_path, logger, use_shields=True):
     """ create python version badge
     """
-    badge = get_python_badge(use_shields=use_shields)
+    badge = get_python_badge(project, use_shields=use_shields)
     if use_shields:
         line_to_add = get_line_to_add('python', badge, use_shields)
     else:
         badge.write_badge(badge_path, overwrite=True)
         line_to_add = get_line_to_add('python', badge_path, use_shields)
-    update_readme(line_to_add, logger)
+    update_readme('python', line_to_add, logger)
