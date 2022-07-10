@@ -34,7 +34,8 @@ def anybadge(project, logger, reactor):
     """
     reports_directory = project.expand_path('$dir_reports')
     images_directory = get_images_directory(project)
-    use_shields = project.get_property('anybadge_use_shields')
+    use_shields = project.get_property('anybadge_use_shields', True)
+    logger.debug(f'using shields: {use_shields}')
     exclude = get_badge_exclude(project)
     logger.debug(f'task instructed to exclude {exclude}')
     if 'python' not in exclude:
@@ -47,7 +48,7 @@ def anybadge(project, logger, reactor):
     if 'complexity' not in exclude:
         report_path = os.path.join(reports_directory, 'radon')
         badge_path = os.path.join(images_directory, 'complexity.svg')
-        use_average = project.get_property('anybadge_complexity_use_average')
+        use_average = project.get_property('anybadge_complexity_use_average', False)
         create_complexity_badge(report_path, badge_path, logger, use_average, use_shields=use_shields)
     if 'coverage' not in exclude:
         report_path = os.path.join(reports_directory, f'{project.name}_coverage.json')
@@ -68,7 +69,7 @@ def get_badge_exclude(project):
     """ return list of badges to exclude
     """
     exclusions = []
-    exclude = project.get_property('anybadge_exclude')
+    exclude = project.get_property('anybadge_exclude', [])
     if exclude:
         exclusions = [item.strip() for item in exclude.split(',')]
     return exclusions
