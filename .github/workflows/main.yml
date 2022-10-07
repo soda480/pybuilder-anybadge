@@ -50,7 +50,6 @@ jobs:
           docker cp $ID:/code/target/reports/pybuilder-anybadge_coverage.xml pybanybadge_coverage.xml
           sed -i -e 's,filename="pybanybadge/,filename="src/main/python/pybanybadge/,g' pybanybadge_coverage.xml
       - name: upload report
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: pybanybadge_coverage.xml

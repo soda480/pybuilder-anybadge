@@ -1,7 +1,7 @@
 # pybuilder-anybadge
 [![GitHub Workflow Status](https://github.com/soda480/pybuilder-anybadge/workflows/build/badge.svg)](https://github.com/soda480/pybuilder-anybadge/actions)
 [![Code Coverage](https://codecov.io/gh/soda480/pybuilder-anybadge/branch/main/graph/badge.svg)](https://codecov.io/gh/soda480/pybuilder-anybadge)
-[![Code Grade](https://api.codiga.io/project/20103/status/svg)](https://app.codiga.io/public/project/20103/pybuilder-anybadge/dashboard)
+[![Code Grade](https://api.codiga.io/project/34777/status/svg)](https://app.codiga.io/hub/project/34777/pybuilder-anybadge)
 [![PyPI version](https://badge.fury.io/py/pybuilder-anybadge.svg)](https://badge.fury.io/py/pybuilder-anybadge)
 [![python](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-teal)](https://www.python.org/downloads/)
 
@@ -45,10 +45,10 @@ project.set_property('anybadge_use_shields', True)
 
 By default the plugin will use `shields.io` to create the badges:
 
-[![coverage](https://img.shields.io/badge/coverage-100.0%25-brightgreen)](https://pybuilder.io/)
-[![complexity](https://img.shields.io/badge/complexity-Stable:%209-olive)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
+[![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://pybuilder.io/)
+[![complexity](https://img.shields.io/badge/complexity-B-olive)](https://radon.readthedocs.io/en/latest/api.html#module-radon.complexity)
 [![vulnerabilities](https://img.shields.io/badge/vulnerabilities-None-brightgreen)](https://pypi.org/project/bandit/)
-[![python](https://img.shields.io/badge/python-3.6-teal)](https://www.python.org/downloads/)
+[![python](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-teal)](https://www.python.org/downloads/)
 
 However, setting `anybadge_use_shields` to `False` will render the badges using `anybadge` and save them as svg files in the `docs\images` folder:
 
@@ -56,7 +56,6 @@ However, setting `anybadge_use_shields` to `False` will render the badges using 
 ![complexity](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/complexity.svg)
 ![vulnerabilities](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/vulnerabilities.svg)
 ![python](https://raw.githubusercontent.com/soda480/pybuilder-anybadge/main/docs/images/python.svg)
-
 
 ### Development
 

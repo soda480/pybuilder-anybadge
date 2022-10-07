@@ -237,7 +237,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Simple: 5', default_color='green')
+        badge_patch.assert_called_once_with('complexity', value='A', default_color='green')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_StableGreen(self, badge_patch, *patches):
@@ -248,7 +248,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Stable: 10', default_color='olive')
+        badge_patch.assert_called_once_with('complexity', value='B', default_color='olive')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_SlightYellow(self, badge_patch, *patches):
@@ -259,7 +259,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Slight: 20', default_color='yellow')
+        badge_patch.assert_called_once_with('complexity', value='C', default_color='yellow')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_ComplexOrange(self, badge_patch, *patches):
@@ -270,7 +270,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Complex: 30', default_color='orange')
+        badge_patch.assert_called_once_with('complexity', value='D', default_color='orange')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_AlarmingRed(self, badge_patch, *patches):
@@ -281,7 +281,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Alarming: 40', default_color='red')
+        badge_patch.assert_called_once_with('complexity', value='E', default_color='red')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UnstableBrightred(self, badge_patch, *patches):
@@ -292,7 +292,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Unstable: 50', default_color='brightred')
+        badge_patch.assert_called_once_with('complexity', value='F', default_color='brightred')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UseAverage(self, badge_patch, *patches):
@@ -304,7 +304,7 @@ class TestTask(unittest.TestCase):
         }
         result = get_complexity_badge(complexity_report, use_average=True)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('complexity', value='Unstable: 79', default_color='brightred')
+        badge_patch.assert_called_once_with('complexity', value='F', default_color='brightred')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_complexity_badge_Should_ReturnExpected_When_UseShields(self, badge_patch, *patches):
@@ -314,7 +314,7 @@ class TestTask(unittest.TestCase):
             }
         }
         result = get_complexity_badge(complexity_report, use_shields=True)
-        expected_result = 'https://img.shields.io/badge/complexity-Simple:%205-brightgreen'
+        expected_result = 'https://img.shields.io/badge/complexity-A-brightgreen'
         self.assertEqual(result, expected_result)
 
     @patch('pybuilder_anybadge.task.Badge')
@@ -420,15 +420,15 @@ class TestTask(unittest.TestCase):
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Yellow(self, badge_patch, *patches):
-        result = get_coverage_badge(84.234342342343)
+        result = get_coverage_badge(84.534342342343)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('coverage', value='84.23%', default_color='yellow')
+        badge_patch.assert_called_once_with('coverage', value='85%', default_color='yellow')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Orange(self, badge_patch, *patches):
         result = get_coverage_badge(69.13933332232)
         self.assertEqual(result, badge_patch.return_value)
-        badge_patch.assert_called_once_with('coverage', value='69.14%', default_color='orange')
+        badge_patch.assert_called_once_with('coverage', value='69%', default_color='orange')
 
     @patch('pybuilder_anybadge.task.Badge')
     def test__get_coverage_badge_Should_ReturnExpected_When_Red(self, badge_patch, *patches):
