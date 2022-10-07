@@ -140,32 +140,32 @@ def get_complexity_badge(complexity_report, use_average=False, use_shields=False
         score = complexity_report['average']
 
     if score <= 5:
-        value = 'Simple'
+        value = 'A'
         if use_shields:
             color = 'brightgreen'
         else:
             color = 'green'
     elif score <= 10:
-        value = 'Stable'
+        value = 'B'
         color = 'olive'
     elif score <= 20:
-        value = 'Slight'
+        value = 'C'
         color = 'yellow'
     elif score <= 30:
-        value = 'Complex'
+        value = 'D'
         color = 'orange'
     elif score <= 40:
-        value = 'Alarming'
+        value = 'E'
         color = 'red'
     else:
-        value = 'Unstable'
+        value = 'F'
         color = 'brightred'
 
     if use_shields:
-        badge = f'https://img.shields.io/badge/complexity-{value}: {score}-{color}'
+        badge = f'https://img.shields.io/badge/complexity-{value}-{color}'
         badge = badge.replace(' ', '%20')
     else:
-        badge = Badge('complexity', value=f'{value}: {score}', default_color=color)
+        badge = Badge('complexity', value=f'{value}', default_color=color)
     return badge
 
 
