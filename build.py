@@ -19,7 +19,7 @@ name = 'pybuilder-anybadge'
 authors = [Author('Emilio Reyes', 'soda480@gmail.com')]
 summary = 'A pybuilder plugin that generates badges for your project'
 url = 'https://github.com/soda480/pybuilder-anybadge'
-version = '0.3.2'
+version = '0.3.3'
 default_task = [
     'clean',
     'analyze',
@@ -47,13 +47,6 @@ def set_properties(project):
     project.set_property('distutils_description_overwrite', True)
     project.set_property('distutils_upload_skip_existing', True)
     project.set_property('distutils_classifiers', [
-        'Development Status :: 4 - Beta',
-        'Environment :: Other Environment',
-        'Environment :: Plugins',
-        'Intended Audience :: Developers',
-        'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',

@@ -225,7 +225,7 @@ def get_coverage_badge(coverage, use_shields=False):
         color = 'orange'
     if coverage < 55:
         color = 'red'
-    value = f'{round(coverage, 2)}%'
+    value = f'{round(coverage)}%'
     if use_shields:
         badge = f'https://img.shields.io/badge/coverage-{value}-{color}'
         badge = badge.replace('%', '%25')
